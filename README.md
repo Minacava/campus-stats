@@ -101,6 +101,15 @@ node dist/cli.js sync --source fbref --competition "FA Women's Super League"
 node dist/cli.js sync --source fbref --competition "WSL"
 ```
 
+## Persistencia
+
+- **Default:** `.campo-stats/cache.json` (`--json`)
+- **SQLite:** `.campo-stats/campo-stats.sqlite` con `--sqlite` o `--db <path>`
+- Migración: `node dist/cli.js migrate --db .campo-stats/campo-stats.sqlite`
+- Requisito: Node ≥ 22 (`node:sqlite`). Backup: copiar el fichero `.sqlite` / `cache.json`.
+
+Detalles: [`docs/sqlite-engine.md`](./docs/sqlite-engine.md), [`docs/sqlite-schema.md`](./docs/sqlite-schema.md).
+
 ## Contributing
 
 Adapters: follow the checklist in

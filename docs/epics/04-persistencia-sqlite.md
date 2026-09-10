@@ -33,4 +33,10 @@ Ver `docs/player-stats-sync-cost.md`. El schema SQL debe incluir tablas
 - [x] Mantener merge semántico en sync (upsert por identidad / provenance)
 - [x] Flags CLI para path de DB y, si hace falta, modo legacy JSON
 - [x] Tests de migración y de queries representativas
-- [ ] Actualizar README: ubicación de la DB, backup, límites
+- [x] Actualizar README: ubicación de la DB, backup, límites
+
+
+## Criterios de hecho — estado
+
+Epic 04 completado: `node:sqlite`, schema, SqliteStore, migrate, flags CLI.
+Default sigue siendo JSON; usar `--sqlite` / `migrate` cuando el volumen lo pida.
