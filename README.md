@@ -1,51 +1,43 @@
-# Campus (`campus`)
+# Campus (`campus-stats`)
 
 **Open, normalized, queryable data for women's football — installable in your app.**
 
-`campus` is an npm package (library + CLI) that pulls women's football stats
-from public sources, normalizes them into one schema, and gives your web/API/app
-access to competitions, seasons, clubs, national teams, matches, lineups,
-player stats, and basic fantasy points.
+`campus-stats` is the npm package for **Campus**: a library + CLI that pulls
+women's football stats from public sources, normalizes them into one schema,
+and gives your web/API/app access to competitions, seasons, clubs, national
+teams, matches, lineups, player stats, and basic fantasy points.
 
-Requires **Node.js ≥ 22** (library and CLI). For browser UIs, load data in a
-Node/serverless backend (or ship a pre-pulled JSON cache) and send JSON to the
-client.
+Requires **Node.js ≥ 22**.
 
 ---
 
-## Install in a web/app project
+## Install
 
-Packages are published from this GitLab project (not npmjs.com):
-
-```bash
-npm install campus \
-  --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
-```
-
-Or pin a tarball after a tagged release:
+Published on **npmjs.com**:
 
 ```bash
-npm install \
-  https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
+npm install campus-stats
+
+npx campus sync --competition "Liga F"
+npx campus teams --competition "Liga F"
+npx campus matches --competition "Liga F" --team "Barcelona"
 ```
 
-Browse packages: https://gitlab.com/marina34/campus/-/packages
+The CLI binaries are `campus` and `campus-stats` (same entrypoint).
 
-Full install options: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
+Maintainer publish setup: [`docs/npm.md`](./docs/npm.md).  
+Optional GitLab mirror: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
 
 ---
 
 ## Use as a library (recommended for apps)
 
 ```ts
-import { CampusClient } from "campus";
+import { CampusClient } from "campus-stats";
 
-// Option A — pull the cron-refreshed data bundle (no local sync needed)
-const client = await CampusClient.fromBundle();
-
-// Option B — open/create a local cache and sync everything once
-// const client = await CampusClient.open();
-// await client.syncFantasy({ includePlayerStats: true });
+const client = await CampusClient.open();
+await client.syncFantasy({ includePlayerStats: true });
+// or: const client = await CampusClient.fromBundle();
 
 const clubs = client.teams({ competition: "Liga F", kind: "club" });
 const nations = client.teams({ competition: "Women's World Cup", kind: "national" });
@@ -53,7 +45,6 @@ const matches = client.matches({ competition: "Liga F", team: "Barcelona" });
 const squad = client.squad({ competition: "Liga F", team: "Barcelona" });
 const points = client.fantasyPoints({ competition: "Liga F", player: "Walsh" });
 
-// Serialize to your frontend
 return Response.json({ clubs, nations, matches, squad, points });
 ```
 
@@ -66,7 +57,7 @@ return Response.json({ clubs, nations, matches, squad, points });
 | `scoreFantasyPoints` | Default fantasy scoring rules |
 | `listInjuries` | Stable stub (empty until a source exists) |
 | Types | `Competition`, `Team`, `Match`, `Player`, `LineupEntry`, … |
-| CLI bin `campus` | Same data from the terminal |
+| CLI bins `campus` / `campus-stats` | Same data from the terminal |
 
 ---
 
@@ -81,6 +72,8 @@ Details: [`docs/cron.md`](./docs/cron.md).
 ---
 
 ## CLI quick start
+
+After `npm install campus-stats`:
 
 ```bash
 npx campus sync --fantasy                 # all women's comps (clubs + selecciones)
@@ -126,13 +119,15 @@ Injuries are **not** in these open feeds yet — the API is ready, the list is e
 
 ## Develop from a clone
 
+For contributors working on this repo:
+
 ```bash
 git clone https://gitlab.com/marina34/campus.git
 cd campus
 npm install
 npm run build
 npm test
-node dist/cli.js --help
+npx campus --help
 ```
 
 ---
@@ -146,9 +141,9 @@ node dist/cli.js --help
 | [02 — Identity](./docs/epics/02-resolucion-identidad.md) | Cross-source team resolution |
 | [03 — Player stats](./docs/epics/03-stats-jugadora.md) | Per-match player stats |
 | [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
-| [05 — Package](./docs/epics/05-publicacion-npm.md) | GitLab package distribution |
+| [05 — Package](./docs/epics/05-publicacion-npm.md) | npmjs + GitLab package distribution |
 
-More: [`docs/cron.md`](./docs/cron.md) · [`docs/injuries.md`](./docs/injuries.md) · [`docs/gitlab-package.md`](./docs/gitlab-package.md) · [`CHANGELOG.md`](./CHANGELOG.md)
+More: [`docs/cron.md`](./docs/cron.md) · [`docs/injuries.md`](./docs/injuries.md) · [`docs/npm.md`](./docs/npm.md) · [`docs/gitlab-package.md`](./docs/gitlab-package.md) · [`CHANGELOG.md`](./CHANGELOG.md)
 
 ---
 

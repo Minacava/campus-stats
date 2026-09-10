@@ -1,36 +1,39 @@
-# Epic 05 — Package distribution via GitLab
+# Epic 05 — Package distribution (npmjs + GitLab)
 
 ## Goal
 
-Distribute the `campus` CLI/library so users can install it **from this
-GitLab project** (Package Registry / tarball) — **not** from npmjs.com.
+Distribute the Campus library/CLI so users can run:
+
+```bash
+npm install campus-stats
+```
+
+from the **public npm registry**, with an optional mirror on this GitLab
+project's Package Registry.
 
 ## Context
 
-Package name remains `campus`. Consumers install with the project npm
-registry URL or a Generic Package tarball. Maintainers publish by pushing a
-`vX.Y.Z` tag; CI uploads to GitLab using `CI_JOB_TOKEN`.
+The unscoped name `campus` is taken on npmjs.com. The published package name
+is therefore **`campus-stats`**. The product brand remains Campus; CLI bins
+are `campus` and `campus-stats`. Maintainers publish by pushing a `vX.Y.Z`
+tag; CI uploads to npmjs (`NPM_TOKEN`) and mirrors to GitLab (`CI_JOB_TOKEN`).
 
 ## Definition of done
 
-- `package.json` ready (`name`, `bin`, `exports`, `files`, version)
-- Reproducible build and CLI entrypoint
-- README clearly documents install from GitLab, usage, and use cases
-- CI publishes to GitLab Package Registry on version tags (no npmjs)
-- Local `npm pack` / install-from-tarball verified
+- `package.json` ready (`name: campus-stats`, bins, `exports`, `files`, version)
+- Reproducible build and CLI entrypoints
+- README documents `npm install campus-stats` and library usage
+- CI publishes to npmjs on version tags; GitLab mirror optional but wired
+- Local `npm pack` / dry-run verified
+- Maintainer docs for `NPM_TOKEN`
 
 ## Tasks
 
-- [x] Finalize package name (`campus`) and `package.json` (name, bin, exports, files)
-- [x] Ensure reproducible build (`npm run build`) and correct CLI entrypoints
-- [x] Consumer-oriented README (GitLab install, how to use, use cases, credits)
-- [x] Define initial semver (e.g. `0.1.0`) and what that version guarantees
-- [x] Pre-publish checklist: license, data terms, `files` / `.npmignore`, no cache/fixtures in the tarball
-- [x] Test local pack (`npm pack`) and install from tarball
-- [x] CI pipeline: test + publish to **GitLab** Package Registry on tag
-- [x] Document install from GitLab (`docs/gitlab-package.md`); do **not** publish to npmjs
-
-## Definition of done — status
-
-Epic 05 complete for GitLab distribution. Push tag `v0.1.0` on `main` after
-merge to populate Deploy → Package registry.
+- [x] Finalize package name (`campus-stats`) and `package.json`
+- [x] Ensure reproducible build and CLI entrypoints (`campus`, `campus-stats`)
+- [x] Consumer-oriented README (npm install, library + CLI)
+- [x] Semver notes (`docs/versioning.md`)
+- [x] Pre-publish checklist
+- [x] CI: `publish_npmjs` + `publish_gitlab_package` on tags
+- [x] Document npm publish (`docs/npm.md`) and GitLab mirror
+- [ ] Maintainer: set `NPM_TOKEN` and tag `v0.4.0` after merge
