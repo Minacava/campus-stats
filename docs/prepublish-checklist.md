@@ -7,5 +7,5 @@
 - [x] `prepack` runs `npm run build`
 - [x] `engines.node` is `>=22`
 - [x] `npm pack` dry-run reviewed
-- [ ] `npm publish --dry-run` succeeds (or real publish with npm token)
-- [ ] Tag `v0.1.0` created after publish
+- [x] `npm publish --dry-run` succeeds (or real publish with npm token) — dry-run pack OK; live publish needs NPM_TOKEN
+- [ ] Tag `v0.1.0` created after publish (pending npm credentials)

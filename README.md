@@ -87,8 +87,8 @@ SQLite.
 
 ## Current status
 
-Epics 00–04 done. Epic 05 (npm publish) in progress — package metadata at
-`0.1.0`.
+Epics 00–05 packaging done (`0.1.0`). Live npm publish awaits `NPM_TOKEN` +
+`v0.1.0` tag — see [`docs/npm-publish.md`](./docs/npm-publish.md).
 
 ## Data source & terms
 
