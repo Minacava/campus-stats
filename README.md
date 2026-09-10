@@ -64,18 +64,37 @@ tests offline y docs de contribución. Siguiente: Epic 01 (FBref).
 
 ## Data source & terms
 
-v0 ships one adapter: [StatsBomb Open Data](https://github.com/statsbomb/open-data),
-covering Liga F, FA Women's Super League, Frauen-Bundesliga, Serie A Women,
-NWSL, Women's World Cup, and UEFA Women's Euro (women's competitions only).
+v0 ships adapters for:
 
-**This code is MIT. The data is not ours to relicense.** StatsBomb makes it
-free for research and genuine football-analytics use. If you publish analysis
-built on it, credit StatsBomb (see their
-[media pack](https://statsbomb.com/media-pack/)). Pass that requirement on to
-whoever uses this package — do not strip it out downstream.
+- [StatsBomb Open Data](https://github.com/statsbomb/open-data) — Liga F, FA Women's
+  Super League, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, UEFA
+  Women's Euro (women's competitions only).
+- **FBref** (HTML schedule pages) — pilots documented in
+  [`docs/fbref-pilot.md`](./docs/fbref-pilot.md) (WSL + Liga F). Live fetches use a
+  rate-limited client; Cloudflare may block some networks — fixtures cover CI.
 
-The same notice lives at the top of
-[`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
+**This code is MIT. The data is not ours to relicense.**
+
+- StatsBomb: free for research and genuine football-analytics use. If you publish
+  analysis built on it, credit StatsBomb (see their
+  [media pack](https://statsbomb.com/media-pack/)). Notice also in
+  [`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
+- FBref / Sports Reference: respect site terms, `robots.txt`, and rate limits.
+  Notice in [`src/sources/fbref.ts`](./src/sources/fbref.ts).
+
+Pass those requirements downstream — do not strip them out.
+
+### Sync examples
+
+```bash
+# StatsBomb (default)
+node dist/cli.js sync --competition "Liga F"
+
+# FBref pilot (WSL)
+node dist/cli.js sync --source fbref --competition "FA Women's Super League"
+# alias:
+node dist/cli.js sync --source fbref --competition "WSL"
+```
 
 ## Contributing
 
