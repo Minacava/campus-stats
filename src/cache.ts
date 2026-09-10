@@ -7,7 +7,13 @@ export const DEFAULT_CACHE_DIR = ".campo-stats";
 export const DEFAULT_CACHE_FILE = "cache.json";
 
 export function emptyCache(): CampoCache {
-  return { competitions: [], seasons: [], teams: [], matches: [] };
+  return {
+    competitions: [],
+    seasons: [],
+    teams: [],
+    matches: [],
+    identities: [],
+  };
 }
 
 export function cachePath(cwd: string = process.cwd()): string {
@@ -23,6 +29,7 @@ export async function loadCache(filePath: string = cachePath()): Promise<CampoCa
       seasons: parsed.seasons ?? [],
       teams: parsed.teams ?? [],
       matches: parsed.matches ?? [],
+      identities: parsed.identities ?? [],
     };
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;

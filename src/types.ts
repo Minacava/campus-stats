@@ -1,3 +1,5 @@
+import type { CanonicalIdentity } from "./identity/types.js";
+
 /**
  * Canonical domain schema for campo-stats.
  * Provider-agnostic — adapters map raw source fields into these types.
@@ -57,4 +59,6 @@ export interface CampoCache {
   seasons: Season[];
   teams: Team[];
   matches: Match[];
+  /** Cross-source identity resolutions (epic 02). */
+  identities: CanonicalIdentity[];
 }
