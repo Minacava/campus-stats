@@ -59,8 +59,8 @@ SQLite.
 
 ## Estado actual
 
-Epics 00–01 implementados: fundación StatsBomb + adapter FBref (pilotos WSL/Liga F,
-CLI `--source`, merge en caché). Siguiente: Epic 02 (identidad cross-source).
+Epics 00–02 implementados: fundación, FBref, identidad cross-source de equipos.
+Siguiente: Epic 03 (stats a nivel jugadora).
 
 ## Data source & terms
 
