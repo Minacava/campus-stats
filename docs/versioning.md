@@ -1,5 +1,10 @@
 # Versioning
 
+## `0.4.2` (Vercel homepage)
+
+- `homepage` → https://campus-tawny-mu.vercel.app/
+- npm README links public docs only (`campus-docs`)
+
 ## `0.4.1` (public docs links on npm)
 
 - `package.json` `repository` / `homepage` / `bugs` → `marina34/campus-docs`
