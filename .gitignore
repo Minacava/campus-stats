@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.campo-stats/
+*.tgz
+.DS_Store
