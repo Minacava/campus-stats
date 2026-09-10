@@ -6,3 +6,5 @@ export type {
   Match,
   CampoCache,
 } from "./types.js";
+export type { FootballSource, SyncResult } from "./sources/types.js";
+export { StatsBombSource } from "./sources/statsbomb.js";
