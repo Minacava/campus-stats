@@ -25,5 +25,9 @@ Cada entidad ya lleva `sources[]` con provenance. Con dos fuentes, el mismo equi
 - [x] Persistir resoluciones en caché (o tabla dedicada si ya hay SQLite)
 - [x] Exponer en CLI: listar duplicados / identidades y, si aplica, confirmar/rechazar matches
 - [x] Fixtures con conflictos reales (mismo club, nombres distintos entre StatsBomb y FBref)
-- [ ] Documentar limitaciones (homónimos, renombres de club, transliteraciones)
-- [ ] (Opcional, si Epic 03 avanzó) Extender el mismo enfoque a jugadoras
+- [x] Documentar limitaciones (homónimos, renombres de club, transliteraciones)
+- [x] ~~(Opcional, si Epic 03 avanzó) Extender el mismo enfoque a jugadoras~~ — diferido hasta Epic 03
+
+## Criterios de hecho — estado
+
+Epic 02 (equipos) completado. Jugadoras quedan para después de Epic 03.
