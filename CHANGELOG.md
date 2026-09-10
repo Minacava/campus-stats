@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- npm `repository` / `bugs` → https://github.com/Minacava/campus-stats
+  (`homepage` stays on the public docs site)
+
 ## 0.4.3
 
 - npm `homepage` and `repository` both point at
