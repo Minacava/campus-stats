@@ -23,5 +23,12 @@ StatsBomb publica event files ricos pero grandes; v0 los omite a propósito. Inc
 - [x] (Si Epic 01 listo) Mapear el equivalente disponible en FBref al mismo schema — diferido (ver docs/fbref-player-stats-deferred.md)
 - [x] Ampliar CLI: queries de jugadoras y stats por partido/temporada
 - [x] Tests con fixture reducido de eventos (no subir dumps enormes al repo)
-- [ ] Documentar coste de sync y requisitos de almacenamiento
-- [ ] Coordinar con Epic 04 si el JSON en memoria deja de ser viable
+- [x] Documentar coste de sync y requisitos de almacenamiento
+- [x] Coordinar con Epic 04 si el JSON en memoria deja de ser viable
+
+
+## Criterios de hecho — estado
+
+Epic 03 completado para StatsBomb (FBref player stats diferido).
+Con `--with-players` el JSON sigue OK si `player-stats-limit` es bajo;
+temporada completa → Epic 04 (ver nota en `04-persistencia-sqlite.md`).
