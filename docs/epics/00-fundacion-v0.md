@@ -21,7 +21,7 @@ v0 ya está esbozado en el starter: `src/types.ts` define entidades provider-agn
 ## Tasks
 
 - [x] Inventariar el código existente (types, sources, CLI, cache) y alinear el README del repo con la visión Campus / campo-stats
-- [ ] Definir y documentar el esquema canónico `Competition`, `Season`, `Team`, `Match` (campos obligatorios vs opcionales)
+- [x] Definir y documentar el esquema canónico `Competition`, `Season`, `Team`, `Match` (campos obligatorios vs opcionales)
 - [ ] Completar / endurecer el adapter StatsBomb (`FootballSource`) con mapeo estable y provenance `sources`
 - [ ] Implementar caché JSON en `.campo-stats/cache.json` con merge por sync (no replace)
 - [ ] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` con filtros documentados
