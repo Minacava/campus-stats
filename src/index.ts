@@ -26,3 +26,4 @@ export {
   DEFAULT_CACHE_DIR,
   DEFAULT_CACHE_FILE,
 } from "./cache.js";
+export { SqliteStore, SCHEMA_SQL } from "./db/sqlite-store.js";
