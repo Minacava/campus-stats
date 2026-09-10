@@ -47,5 +47,10 @@ describe("parseFbrefSchedule", () => {
       Object.keys(sample).sort().join(","),
       "awayScore,awayTeamId,competitionId,date,homeScore,homeTeamId,id,seasonId,sources",
     );
+    assert.deepEqual(result.competitions[0]?.sources, [
+      { source: "fbref", id: "189" },
+    ]);
+    assert.equal(sample.sources[0]?.source, "fbref");
+    assert.ok(result.teams.every((t) => t.sources[0]?.source === "fbref"));
   });
 });
