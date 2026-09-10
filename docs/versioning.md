@@ -1,5 +1,18 @@
 # Versioning
 
+## `0.4.0` (npm package name `campus-stats`)
+
+Breaking rename of the **npm package name** so public install works without a
+scope and without a GitLab `.npmrc`:
+
+- npm package: **`campus-stats`** (was `campus`; `campus` is taken on npmjs.com)
+- Install: `npm install campus-stats` from registry.npmjs.org
+- Import: `import { CampusClient } from "campus-stats"`
+- CLI bins: `campus` and `campus-stats` (same binary)
+- Product brand, `CampusClient`, `.campus/` cache, and `campus-data` bundle
+  names are unchanged
+- CI publishes to npmjs (`NPM_TOKEN`) and mirrors to GitLab
+
 ## `0.3.0` (rename to campus)
 
 Breaking rename for brand alignment:
@@ -8,13 +21,6 @@ Breaking rename for brand alignment:
 - `CampusClient` / `CampusCache` (was `CampoClient` / `CampoCache`)
 - Local store: `.campus/` (was `.campo-stats/`)
 - Data bundle: `campus-data/latest` (was `campo-stats-data/latest`)
-
-Install:
-
-```bash
-npm install campus \
-  --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
-```
 
 ## `0.2.0` (app install focus)
 
@@ -26,7 +32,7 @@ npm install campus \
 ## `0.1.0` (initial public release)
 
 - CLI sync/query, StatsBomb + FBref, JSON/SQLite, player stats (capped), identities
-- GitLab Package Registry distribution (not npmjs)
+- GitLab Package Registry distribution
 
 SemVer: breaking CLI/schema changes bump major after 1.0; before 1.0,
 breaking changes may appear in minor bumps with release notes.

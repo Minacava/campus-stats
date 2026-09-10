@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0
+
+- **Rename (npm):** package **`campus`** → **`campus-stats`** so public
+  `npm install campus-stats` works (unscoped `campus` is taken on npmjs.com)
+- Publish target: **npmjs.com** primary; GitLab Package Registry as mirror
+- CLI bins: `campus` and `campus-stats` (same entrypoint)
+- Import path: `import { CampusClient } from "campus-stats"`
+- Product brand, `CampusClient`, `.campus/` cache, and `campus-data` unchanged
+
 ## 0.3.0
 
 - **Rename:** package/CLI `campo-stats` → **`campus`** (brand alignment)
