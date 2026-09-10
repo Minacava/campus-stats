@@ -9,8 +9,7 @@ formats. `campo-stats` doesn't generate new data — it fetches from
 providers who already publish it, and normalizes everything into one
 schema so you can query Liga F, the WSL, the NWSL, etc. the same way.
 
-> **Name:** `campus` was already taken on npm, so the package is
-> `campo-stats` ("campo" = pitch/field in Spanish).
+The npm package name is `campo-stats`.
 
 ## Plan de trabajo
 
