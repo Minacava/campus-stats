@@ -8,6 +8,7 @@ export type {
 } from "./types.js";
 export type { FootballSource, SyncResult } from "./sources/types.js";
 export { StatsBombSource } from "./sources/statsbomb.js";
+export { FbrefSource, listFbrefPilotNames } from "./sources/fbref.js";
 export {
   emptyCache,
   cachePath,

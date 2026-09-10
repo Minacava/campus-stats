@@ -5,14 +5,16 @@ import {
   mergeSyncResult,
   saveCache,
 } from "./cache.js";
+import { FbrefSource } from "./sources/fbref.js";
 import { StatsBombSource } from "./sources/statsbomb.js";
+import type { FootballSource } from "./sources/types.js";
 import type { CampoCache } from "./types.js";
 
 function usage(): never {
   console.error(`campo-stats — women's football data CLI
 
 Usage:
-  campo-stats sync --competition <name>
+  campo-stats sync --competition <name> [--source statsbomb|fbref]
   campo-stats competitions
   campo-stats seasons --competition <name>
   campo-stats teams --competition <name>
@@ -20,6 +22,7 @@ Usage:
 
 Options:
   --competition <name>  Competition display name (e.g. "Liga F")
+  --source <id>         Data source for sync (default: statsbomb)
   --season <name>       Season label (e.g. "2023/2024")
   --team <name>         Team name substring (case-insensitive)
   --help                Show this help
@@ -60,8 +63,17 @@ function requireCompetition(cache: CampoCache, name: string) {
 async function cmdSync(args: string[]): Promise<void> {
   const competition = getFlag(args, "--competition");
   if (!competition) usage();
+  const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
 
-  const source = new StatsBombSource();
+  let source: FootballSource;
+  if (sourceId === "statsbomb") {
+    source = new StatsBombSource();
+  } else if (sourceId === "fbref") {
+    source = new FbrefSource();
+  } else {
+    throw new Error(`Unknown source: "${sourceId}". Use statsbomb or fbref.`);
+  }
+
   console.error(`Syncing "${competition}" from ${source.id}…`);
   const result = await source.syncCompetition(competition);
   const cache = mergeSyncResult(await loadCache(), result);
@@ -70,6 +82,7 @@ async function cmdSync(args: string[]): Promise<void> {
   console.log(
     JSON.stringify(
       {
+        source: source.id,
         cache: cachePath(),
         competition: result.competitions[0]?.name,
         seasons: result.seasons.length,
