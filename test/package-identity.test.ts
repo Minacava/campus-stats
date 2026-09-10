@@ -28,7 +28,7 @@ describe("campus-stats package identity", () => {
     assert.equal(pkg.bin["campus-stats"], "./dist/cli.js");
     assert.equal(pkg.bin["campo-stats"], undefined);
     assert.match(pkg.repository?.url ?? "", /marina34\/campus-docs\.git/);
-    assert.match(pkg.homepage ?? "", /marina34\.gitlab\.io\/campus-docs/);
+    assert.match(pkg.homepage ?? "", /campus-tawny-mu\.vercel\.app/);
   });
 
   it("uses .campus cache paths and CampusClient export", () => {
