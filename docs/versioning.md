@@ -1,5 +1,9 @@
 # Versioning
 
+## `0.4.3` (Vercel for homepage + repository)
+
+- `homepage` and `repository` → https://campus-tawny-mu.vercel.app/
+
 ## `0.4.2` (Vercel homepage)
 
 - `homepage` → https://campus-tawny-mu.vercel.app/

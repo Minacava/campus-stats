@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3
+
+- npm `homepage` and `repository` both point at
+  https://campus-tawny-mu.vercel.app/ (no GitLab repo link on the package page)
+
 ## 0.4.2
 
 - `homepage` → https://campus-tawny-mu.vercel.app/
