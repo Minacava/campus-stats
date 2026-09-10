@@ -1,4 +1,4 @@
-# Pre-publish checklist
+# Pre-publish checklist (GitLab Package Registry)
 
 - [x] `LICENSE` is MIT and included in `files`
 - [x] README documents StatsBomb / FBref data terms and credit
@@ -7,5 +7,7 @@
 - [x] `prepack` runs `npm run build`
 - [x] `engines.node` is `>=22`
 - [x] `npm pack` dry-run reviewed
-- [x] `npm publish --dry-run` succeeds (or real publish with npm token) — dry-run pack OK; live publish needs NPM_TOKEN
-- [ ] Tag `v0.1.0` created after publish (pending npm credentials)
+- [x] CI publishes to **GitLab** (not npmjs) on `vX.Y.Z` tags
+- [ ] Tag `v0.1.0` pushed on `main` after merge (creates the downloadable package)
+
+See [`docs/gitlab-package.md`](./gitlab-package.md).
