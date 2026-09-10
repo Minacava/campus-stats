@@ -14,7 +14,7 @@ export interface HttpClientOptions {
 }
 
 const DEFAULT_UA =
-  "campo-stats/0.0.1 (women's football research; +https://gitlab.com/marina34/campus)";
+  "campus/0.0.1 (women's football research; +https://gitlab.com/marina34/campus)";
 
 function defaultSleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

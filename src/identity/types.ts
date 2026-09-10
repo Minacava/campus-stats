@@ -1,5 +1,5 @@
 /**
- * Cross-source identity model for campo-stats.
+ * Cross-source identity model for campus.
  *
  * A CanonicalIdentity groups one or more provider-native SourceRefs that
  * refer to the same real-world club (later: player). Confidence and status
@@ -21,7 +21,7 @@ export type IdentityConfidence = "high" | "medium" | "low";
 export type IdentityStatus = "resolved" | "pending" | "rejected";
 
 export interface CanonicalIdentity {
-  /** Stable campo-stats identity id, e.g. `identity:team:…`. */
+  /** Stable campus identity id, e.g. `identity:team:…`. */
   id: string;
   kind: IdentityKind;
   /** Preferred display name. */

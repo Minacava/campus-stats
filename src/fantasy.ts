@@ -10,7 +10,7 @@ import {
   type WomenCompetitionInfo,
 } from "./sources/statsbomb.js";
 import type { SyncResult } from "./sources/types.js";
-import type { CampoCache, Competition } from "./types.js";
+import type { CampusCache, Competition } from "./types.js";
 
 export type { WomenCompetitionInfo };
 
@@ -98,7 +98,7 @@ export async function syncFantasyBundle(
  * Re-sync every competition already present in a local cache (refresh path).
  */
 export async function updateCachedCompetitions(
-  cache: CampoCache,
+  cache: CampusCache,
   options: FantasySyncOptions = {},
 ): Promise<SyncResult> {
   const names = [...new Set(cache.competitions.map((c) => c.name))];

@@ -62,7 +62,7 @@ describe("fantasy product helpers", () => {
   it("dataBundleUrl points at the cron-published generic package", () => {
     assert.match(
       dataBundleUrl(),
-      /packages\/generic\/campo-stats-data\/latest\/cache\.json$/,
+      /packages\/generic\/campus-data\/latest\/cache\.json$/,
     );
   });
 });

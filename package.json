@@ -1,7 +1,7 @@
 {
-  "name": "campo-stats",
-  "version": "0.2.0",
-  "description": "Installable women's football data layer for apps — clubs, national teams, matches, lineups, fantasy points",
+  "name": "campus",
+  "version": "0.3.0",
+  "description": "Campus — installable women's football data layer for apps (clubs, national teams, matches, fantasy points)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "campo-stats": "./dist/cli.js"
+    "campus": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -29,6 +29,7 @@
     "node": ">=22"
   },
   "keywords": [
+    "campus",
     "football",
     "soccer",
     "women",

@@ -23,7 +23,7 @@ export interface SyncResult {
 
 /**
  * Provider adapter contract.
- * Implementations map native payloads onto the campo-stats schema and
+ * Implementations map native payloads onto the campus schema and
  * attach provenance via `sources` on every entity.
  */
 export interface FootballSource {
