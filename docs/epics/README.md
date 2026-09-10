@@ -6,7 +6,7 @@ Capa de datos abierta para fútbol femenino: un paquete npm/CLI que normaliza es
 
 La cobertura de datos en fútbol femenino va muy por detrás del masculino. Los datos existen, pero están repartidos en formatos inconsistentes y muchas herramientas del juego masculino no los cubren. `campo-stats` no inventa datos: los obtiene de proveedores que ya los publican y los unifica para poder consultar Liga F, WSL, NWSL, etc. del mismo modo.
 
-> **Nombre:** `campus` ya estaba tomado en npm; el paquete se llama `campo-stats` ("campo" = pitch/field).
+El paquete npm se llama `campo-stats`.
 
 ## Estado actual (v0)
 
