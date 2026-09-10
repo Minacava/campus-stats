@@ -33,13 +33,13 @@ npx campus --help
 After a tagged release, the CI job also uploads:
 
 ```text
-https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.1.0/campus-0.1.0.tgz
+https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
 ```
 
 Install from that URL (public project) or download and install locally:
 
 ```bash
-npm install https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.1.0/campus-0.1.0.tgz
+npm install https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
 ```
 
 ## Option C — clone and build
