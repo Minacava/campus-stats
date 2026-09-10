@@ -1,5 +1,10 @@
 # Versioning
 
+## `0.4.1` (public docs links on npm)
+
+- `package.json` `repository` / `homepage` / `bugs` → `marina34/campus-docs`
+  and https://marina34.gitlab.io/campus-docs/
+
 ## `0.4.0` (npm package name `campus-stats`)
 
 Breaking rename of the **npm package name** so public install works without a

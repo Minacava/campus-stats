@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Point npm `repository` / `homepage` / `bugs` at the public docs project
+  [`marina34/campus-docs`](https://gitlab.com/marina34/campus-docs)
+  (and Pages site), not the private source repo
+
 ## 0.4.0
 
 - **Rename (npm):** package **`campus`** → **`campus-stats`** so public
