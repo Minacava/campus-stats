@@ -22,7 +22,7 @@ Cada entidad ya lleva `sources[]` con provenance. Con dos fuentes, el mismo equi
 - [x] Diseñar modelo: canonical ID, aliases, enlaces a `sources[]`, nivel de confianza
 - [x] Implementar matching de equipos (nombre normalizado + competición/temporada)
 - [x] Definir reglas: auto-merge vs candidato pendiente de revisión
-- [ ] Persistir resoluciones en caché (o tabla dedicada si ya hay SQLite)
+- [x] Persistir resoluciones en caché (o tabla dedicada si ya hay SQLite)
 - [ ] Exponer en CLI: listar duplicados / identidades y, si aplica, confirmar/rechazar matches
 - [ ] Fixtures con conflictos reales (mismo club, nombres distintos entre StatsBomb y FBref)
 - [ ] Documentar limitaciones (homónimos, renombres de club, transliteraciones)
