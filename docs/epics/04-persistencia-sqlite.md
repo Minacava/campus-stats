@@ -26,7 +26,7 @@ Ver `docs/player-stats-sync-cost.md`. El schema SQL debe incluir tablas
 
 ## Tasks
 
-- [ ] Elegir motor (`node:sqlite` vs `better-sqlite3`) y documentar requisito de Node/OS
+- [x] Elegir motor (`node:sqlite` vs `better-sqlite3`) y documentar requisito de Node/OS
 - [ ] Diseñar schema SQL alineado a Competition / Season / Team / Match (+ Player si aplica)
 - [ ] Implementar capa repositorio (CLI y adapters no hablan SQL crudo)
 - [ ] Migración / import desde `.campo-stats/cache.json`
