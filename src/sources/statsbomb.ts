@@ -11,7 +11,8 @@
  */
 
 import { entityId } from "../ids.js";
-import type { Competition, Match, Season, Team } from "../types.js";
+import type { Competition, Match, Player, PlayerMatchStats, Season, Team } from "../types.js";
+import { aggregateStatsBombPlayerMatch } from "./statsbomb-player-stats.js";
 import type { FootballSource, SyncResult } from "./types.js";
 
 const SOURCE = "statsbomb";
@@ -55,6 +56,10 @@ export interface StatsBombSourceOptions {
   baseUrl?: string;
   /** Inject fetch for offline fixtures / tests. */
   fetchJson?: <T>(url: string) => Promise<T>;
+  /** When true, also pull lineups/events and aggregate v1 player stats. */
+  includePlayerStats?: boolean;
+  /** Cap matches enriched with player stats (default 5). */
+  playerStatsLimit?: number;
 }
 
 async function defaultFetchJson<T>(url: string): Promise<T> {
@@ -69,10 +74,14 @@ export class StatsBombSource implements FootballSource {
   readonly id = SOURCE;
   private readonly baseUrl: string;
   private readonly fetchJson: <T>(url: string) => Promise<T>;
+  private readonly includePlayerStats: boolean;
+  private readonly playerStatsLimit: number;
 
   constructor(options: StatsBombSourceOptions = {}) {
     this.baseUrl = options.baseUrl ?? BASE;
     this.fetchJson = options.fetchJson ?? defaultFetchJson;
+    this.includePlayerStats = options.includePlayerStats ?? false;
+    this.playerStatsLimit = options.playerStatsLimit ?? 5;
   }
 
   async syncCompetition(competitionName: string): Promise<SyncResult> {
@@ -167,11 +176,63 @@ export class StatsBombSource implements FootballSource {
       }
     }
 
-    return {
+    const result: SyncResult = {
       competitions: [...competitions.values()],
       seasons: [...seasons.values()],
       teams: [...teams.values()],
       matches,
     };
+
+    if (this.includePlayerStats) {
+      const enriched = await this.loadPlayerStatsForMatches(
+        matches.slice(0, this.playerStatsLimit),
+      );
+      result.players = enriched.players;
+      result.playerMatchStats = enriched.playerMatchStats;
+    }
+
+    return result;
+  }
+
+  /** Load aggregated v1 player stats for the given canonical matches. */
+  async loadPlayerStatsForMatches(
+    matches: Match[],
+  ): Promise<{ players: Player[]; playerMatchStats: PlayerMatchStats[] }> {
+    const players = new Map<string, Player>();
+    const playerMatchStats: PlayerMatchStats[] = [];
+
+    for (const match of matches) {
+      const nativeId = match.sources.find((s) => s.source === SOURCE)?.id;
+      if (!nativeId) continue;
+      const lineups = await this.fetchJson<
+        Array<{
+          team_id: number;
+          team_name: string;
+          lineup: Array<{
+            player_id: number;
+            player_name: string;
+            player_nickname?: string | null;
+            country?: { name?: string };
+            cards?: Array<{ card_type?: string }>;
+            positions?: Array<{ from?: string | null; to?: string | null }>;
+          }>;
+        }>
+      >(`${this.baseUrl}/lineups/${nativeId}.json`);
+      const events = await this.fetchJson<
+        Array<{
+          type?: { name?: string };
+          player?: { id?: number; name?: string };
+          team?: { id?: number; name?: string };
+          shot?: { outcome?: { name?: string } };
+          pass?: { goal_assist?: boolean };
+        }>
+      >(`${this.baseUrl}/events/${nativeId}.json`);
+
+      const agg = aggregateStatsBombPlayerMatch(match.id, lineups, events);
+      for (const p of agg.players) players.set(p.id, p);
+      playerMatchStats.push(...agg.playerMatchStats);
+    }
+
+    return { players: [...players.values()], playerMatchStats };
   }
 }
