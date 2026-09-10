@@ -1,7 +1,7 @@
 # Inventory v0 — repository status
 
 Date: 2026-09-10  
-Project: Campus / `campo-stats` (`marina34/campus`)
+Project: Campus / `campus` (`marina34/campus`)
 
 ## What exists today
 

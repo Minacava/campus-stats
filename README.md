@@ -1,8 +1,8 @@
-# Campus (`campo-stats`)
+# Campus (`campus`)
 
 **Open, normalized, queryable data for women's football — installable in your app.**
 
-`campo-stats` is an npm package (library + CLI) that pulls women's football stats
+`campus` is an npm package (library + CLI) that pulls women's football stats
 from public sources, normalizes them into one schema, and gives your web/API/app
 access to competitions, seasons, clubs, national teams, matches, lineups,
 player stats, and basic fantasy points.
@@ -18,7 +18,7 @@ client.
 Packages are published from this GitLab project (not npmjs.com):
 
 ```bash
-npm install campo-stats \
+npm install campus \
   --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
@@ -26,7 +26,7 @@ Or pin a tarball after a tagged release:
 
 ```bash
 npm install \
-  https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.2.0/campo-stats-0.2.0.tgz
+  https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
 ```
 
 Browse packages: https://gitlab.com/marina34/campus/-/packages
@@ -38,13 +38,13 @@ Full install options: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
 ## Use as a library (recommended for apps)
 
 ```ts
-import { CampoClient } from "campo-stats";
+import { CampusClient } from "campus";
 
 // Option A — pull the cron-refreshed data bundle (no local sync needed)
-const client = await CampoClient.fromBundle();
+const client = await CampusClient.fromBundle();
 
 // Option B — open/create a local cache and sync everything once
-// const client = await CampoClient.open();
+// const client = await CampusClient.open();
 // await client.syncFantasy({ includePlayerStats: true });
 
 const clubs = client.teams({ competition: "Liga F", kind: "club" });
@@ -61,20 +61,20 @@ return Response.json({ clubs, nations, matches, squad, points });
 
 | API | Purpose |
 |-----|---------|
-| `CampoClient` | Main entry for apps: sync / pull / query |
+| `CampusClient` | Main entry for apps: sync / pull / query |
 | `syncFantasyBundle` / `updateCachedCompetitions` | Low-level sync helpers |
 | `scoreFantasyPoints` | Default fantasy scoring rules |
 | `listInjuries` | Stable stub (empty until a source exists) |
 | Types | `Competition`, `Team`, `Match`, `Player`, `LineupEntry`, … |
-| CLI bin `campo-stats` | Same data from the terminal |
+| CLI bin `campus` | Same data from the terminal |
 
 ---
 
 ## Keep data fresh (cron)
 
 1. GitLab **Pipeline schedule** on `main` (e.g. `0 6 * * *`) runs
-   `refresh_fantasy_data` and publishes `campo-stats-data/latest/cache.json`.
-2. Apps call `CampoClient.fromBundle()` or `npx campo-stats pull`.
+   `refresh_fantasy_data` and publishes `campus-data/latest/cache.json`.
+2. Apps call `CampusClient.fromBundle()` or `npx campus pull`.
 
 Details: [`docs/cron.md`](./docs/cron.md).
 
@@ -83,24 +83,24 @@ Details: [`docs/cron.md`](./docs/cron.md).
 ## CLI quick start
 
 ```bash
-npx campo-stats sync --fantasy                 # all women's comps (clubs + selecciones)
-npx campo-stats sync --fantasy --with-players  # + lineups + player stats (capped)
-npx campo-stats pull                           # download cron bundle
-npx campo-stats competitions
-npx campo-stats matches --competition "Liga F" --team "Barcelona"
-npx campo-stats squad --competition "Liga F" --team "Barcelona"
-npx campo-stats fantasy-points --competition "Liga F"
-npx campo-stats injuries                       # empty + documented deferral
+npx campus sync --fantasy                 # all women's comps (clubs + selecciones)
+npx campus sync --fantasy --with-players  # + lineups + player stats (capped)
+npx campus pull                           # download cron bundle
+npx campus competitions
+npx campus matches --competition "Liga F" --team "Barcelona"
+npx campus squad --competition "Liga F" --team "Barcelona"
+npx campus fantasy-points --competition "Liga F"
+npx campus injuries                       # empty + documented deferral
 ```
 
-Store: `.campo-stats/cache.json` (or `--sqlite` / `--db <path>`).
+Store: `.campus/cache.json` (or `--sqlite` / `--db <path>`).
 
 Single-competition sync and identities still work:
 
 ```bash
-npx campo-stats sync --competition "Liga F"
-npx campo-stats sync --source fbref --competition "WSL"
-npx campo-stats identities propose --competition "Liga F"
+npx campus sync --competition "Liga F"
+npx campus sync --source fbref --competition "WSL"
+npx campus identities propose --competition "Liga F"
 ```
 
 ---

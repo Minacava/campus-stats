@@ -1,4 +1,4 @@
-# Install campo-stats from GitLab (not npmjs)
+# Install campus from GitLab (not npmjs)
 
 This project does **not** publish to the public npm registry. Packages are
 hosted on **GitLab Package Registry** for [marina34/campus](https://gitlab.com/marina34/campus).
@@ -8,7 +8,7 @@ Project ID: `86296665`
 ## Option A — npm install from the project registry
 
 ```bash
-npm install campo-stats \
+npm install campus \
   --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
@@ -21,8 +21,8 @@ registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 Then:
 
 ```bash
-npm install campo-stats
-npx campo-stats --help
+npm install campus
+npx campus --help
 ```
 
 > Packages appear under **Deploy → Package registry** after a version tag
@@ -33,13 +33,13 @@ npx campo-stats --help
 After a tagged release, the CI job also uploads:
 
 ```text
-https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.1.0/campo-stats-0.1.0.tgz
+https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.1.0/campus-0.1.0.tgz
 ```
 
 Install from that URL (public project) or download and install locally:
 
 ```bash
-npm install https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.1.0/campo-stats-0.1.0.tgz
+npm install https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.1.0/campus-0.1.0.tgz
 ```
 
 ## Option C — clone and build

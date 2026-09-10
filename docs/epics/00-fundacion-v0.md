@@ -26,10 +26,10 @@ required for published analysis).
 
 ## Tasks
 
-- [x] Inventory existing code (types, sources, CLI, cache) and align the repo README with the Campus / campo-stats vision
+- [x] Inventory existing code (types, sources, CLI, cache) and align the repo README with the Campus / campus vision
 - [x] Define and document the canonical `Competition`, `Season`, `Team`, `Match` schema (required vs optional fields)
 - [x] Complete / harden the StatsBomb adapter (`FootballSource`) with stable mapping and `sources` provenance
-- [x] Implement JSON cache at `.campo-stats/cache.json` with merge-on-sync (not replace)
+- [x] Implement JSON cache at `.campus/cache.json` with merge-on-sync (not replace)
 - [x] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` with documented filters
 - [x] Contract tests: Liga F sync (or offline fixture) + query a team in a season
 - [x] Document StatsBomb terms and credit obligation in README / adapter header

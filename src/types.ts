@@ -4,7 +4,7 @@ import type { CanonicalIdentity } from "./identity/types.js";
 export type { SourceRef } from "./refs.js";
 
 /**
- * Canonical domain schema for campo-stats.
+ * Canonical domain schema for campus.
  * Provider-agnostic — adapters map raw source fields into these types.
  */
 
@@ -12,7 +12,7 @@ export type { SourceRef } from "./refs.js";
 export type TeamKind = "club" | "national";
 
 export interface Competition {
-  /** Stable campo-stats id (derived from primary source + native id). */
+  /** Stable campus id (derived from primary source + native id). */
   id: string;
   /** Display name, e.g. "Liga F". */
   name: string;
@@ -112,7 +112,7 @@ export interface InjuryRecord {
 }
 
 /** In-memory / on-disk cache shape (JSON file in v0). */
-export interface CampoCache {
+export interface CampusCache {
   competitions: Competition[];
   seasons: Season[];
   teams: Team[];

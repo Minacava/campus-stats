@@ -1,6 +1,6 @@
 import path from "node:path";
 import { loadCache, saveCache, cachePath, mergeSyncResult } from "../cache.js";
-import type { CampoCache } from "../types.js";
+import type { CampusCache } from "../types.js";
 import type { SyncResult } from "../sources/types.js";
 import { DEFAULT_DB_PATH, migrateJsonCacheToSqlite } from "./migrate.js";
 import { SqliteStore } from "./sqlite-store.js";
@@ -29,7 +29,7 @@ function getArg(args: string[], name: string): string | undefined {
 export async function readStore(
   mode: StoreMode,
   dbPath: string,
-): Promise<CampoCache> {
+): Promise<CampusCache> {
   if (mode === "json") return loadCache();
   const store = new SqliteStore(dbPath);
   try {
@@ -43,7 +43,7 @@ export async function writeSyncToStore(
   mode: StoreMode,
   dbPath: string,
   result: SyncResult,
-): Promise<CampoCache> {
+): Promise<CampusCache> {
   if (mode === "json") {
     const cache = mergeSyncResult(await loadCache(), result);
     await saveCache(cache);
@@ -63,7 +63,7 @@ export async function writeSyncToStore(
 export async function writeCacheToStore(
   mode: StoreMode,
   dbPath: string,
-  cache: CampoCache,
+  cache: CampusCache,
 ): Promise<void> {
   if (mode === "json") {
     await saveCache(cache);

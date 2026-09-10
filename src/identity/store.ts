@@ -1,4 +1,4 @@
-import type { CampoCache } from "../types.js";
+import type { CampusCache } from "../types.js";
 import type { CanonicalIdentity } from "./types.js";
 
 export function mergeIdentities(
@@ -12,9 +12,9 @@ export function mergeIdentities(
 }
 
 export function upsertIdentities(
-  cache: CampoCache,
+  cache: CampusCache,
   identities: CanonicalIdentity[],
-): CampoCache {
+): CampusCache {
   return {
     ...cache,
     identities: mergeIdentities(cache.identities, identities),
@@ -22,10 +22,10 @@ export function upsertIdentities(
 }
 
 export function setIdentityStatus(
-  cache: CampoCache,
+  cache: CampusCache,
   identityId: string,
   status: CanonicalIdentity["status"],
-): CampoCache {
+): CampusCache {
   return {
     ...cache,
     identities: cache.identities.map((identity) =>

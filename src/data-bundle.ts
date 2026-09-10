@@ -5,7 +5,7 @@
 
 export const GITLAB_PROJECT_ID = "86296665";
 
-export const DATA_BUNDLE_PACKAGE = "campo-stats-data";
+export const DATA_BUNDLE_PACKAGE = "campus-data";
 export const DATA_BUNDLE_VERSION = "latest";
 export const DATA_BUNDLE_FILE = "cache.json";
 

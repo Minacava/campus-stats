@@ -24,7 +24,7 @@ FBref renders a fixtures table with stable `data-stat` attributes:
   - `data-stat="score"` — text like `1–2` (en-dash) or empty if not played
   - `data-stat="away_team"` — link `/en/squads/<id>/...`
 
-The `campo-stats` parser only reads those `data-stat` values; it does not
+The `campus` parser only reads those `data-stat` values; it does not
 depend on volatile CSS classes.
 
 ## Access from this environment

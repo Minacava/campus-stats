@@ -1,4 +1,4 @@
-# Canonical campo-stats schema
+# Canonical campus schema
 
 Types live in [`src/types.ts`](../src/types.ts). Adapters translate raw
 provider fields into this schema; the CLI and cache never see provider names.
@@ -14,7 +14,7 @@ provider fields into this schema; the CLI and cache never see provider names.
 
 | Field | Required | Notes |
 |-------|----------|--------|
-| `id` | yes | Stable campo-stats ID |
+| `id` | yes | Stable campus ID |
 | `name` | yes | Display name / CLI filters |
 | `gender` | yes | Always `"female"` in this package |
 | `sources` | yes | ≥1 provenance |
@@ -51,8 +51,8 @@ provider fields into this schema; the CLI and cache never see provider names.
 | `date` | no | `YYYY-MM-DD` |
 | `homeScore` / `awayScore` | no | `null` if not played / unknown |
 
-## `CampoCache`
+## `CampusCache`
 
 Container of arrays: `competitions`, `seasons`, `teams`, `matches`,
 `identities`, `players`, `playerMatchStats`. Persisted in v0 as
-`.campo-stats/cache.json`.
+`.campus/cache.json`.

@@ -1,5 +1,5 @@
 /**
- * App-facing client: install `campo-stats` and use this from a web API,
+ * App-facing client: install `campus` and use this from a web API,
  * serverless function, or Node backend. Browser bundles can import query
  * helpers against an in-memory cache loaded via `fromBundle` / `fromCache`.
  */
@@ -25,7 +25,7 @@ import {
   type FantasyScoringRules,
 } from "./scoring.js";
 import type {
-  CampoCache,
+  CampusCache,
   Competition,
   InjuryRecord,
   LineupEntry,
@@ -48,31 +48,31 @@ function includesCI(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
-export class CampoClient {
-  private cache: CampoCache;
+export class CampusClient {
+  private cache: CampusCache;
   private readonly persistPath?: string;
 
-  private constructor(cache: CampoCache, persistPath?: string) {
+  private constructor(cache: CampusCache, persistPath?: string) {
     this.cache = cache;
     this.persistPath = persistPath;
   }
 
-  /** Open local JSON cache (default `.campo-stats/cache.json`). */
-  static async open(filePath: string = cachePath()): Promise<CampoClient> {
-    return new CampoClient(await loadCache(filePath), filePath);
+  /** Open local JSON cache (default `.campus/cache.json`). */
+  static async open(filePath: string = cachePath()): Promise<CampusClient> {
+    return new CampusClient(await loadCache(filePath), filePath);
   }
 
   /** Use an in-memory cache (e.g. after fetch in an API route). */
-  static fromCache(cache: CampoCache): CampoClient {
-    return new CampoClient(cache);
+  static fromCache(cache: CampusCache): CampusClient {
+    return new CampusClient(cache);
   }
 
   /** Download the cron-published bundle and optionally merge with local cache. */
   static async fromBundle(options: {
     url?: string;
-    mergeWith?: CampoCache;
+    mergeWith?: CampusCache;
     persistPath?: string;
-  } = {}): Promise<CampoClient> {
+  } = {}): Promise<CampusClient> {
     const url = options.url ?? dataBundleUrl(GITLAB_PROJECT_ID);
     const res = await fetch(url);
     if (!res.ok) {
@@ -81,8 +81,8 @@ export class CampoClient {
           "Publish via GitLab CI schedule (docs/cron.md) or call syncFantasy() once.",
       );
     }
-    const remote = (await res.json()) as Partial<CampoCache>;
-    const incoming: CampoCache = {
+    const remote = (await res.json()) as Partial<CampusCache>;
+    const incoming: CampusCache = {
       ...emptyCache(),
       competitions: remote.competitions ?? [],
       seasons: remote.seasons ?? [],
@@ -107,13 +107,13 @@ export class CampoClient {
     });
     merged.identities =
       base.identities.length > 0 ? base.identities : incoming.identities;
-    const client = new CampoClient(merged, options.persistPath);
+    const client = new CampusClient(merged, options.persistPath);
     if (options.persistPath) await client.save();
     return client;
   }
 
   /** Snapshot of normalized data (safe to serialize to the browser). */
-  get data(): CampoCache {
+  get data(): CampusCache {
     return this.cache;
   }
 
@@ -122,7 +122,7 @@ export class CampoClient {
   }
 
   /** Sync every women's StatsBomb competition (clubs + national teams). */
-  async syncFantasy(options: FantasySyncOptions = {}): Promise<CampoCache> {
+  async syncFantasy(options: FantasySyncOptions = {}): Promise<CampusCache> {
     const result = await syncFantasyBundle(options);
     this.cache = mergeSyncResult(this.cache, result);
     if (this.persistPath) await this.save();
@@ -130,7 +130,7 @@ export class CampoClient {
   }
 
   /** Re-sync competitions already present in the cache. */
-  async update(options: FantasySyncOptions = {}): Promise<CampoCache> {
+  async update(options: FantasySyncOptions = {}): Promise<CampusCache> {
     const result = await updateCachedCompetitions(this.cache, options);
     this.cache = mergeSyncResult(this.cache, result);
     if (this.persistPath) await this.save();
@@ -138,8 +138,8 @@ export class CampoClient {
   }
 
   /** Pull the published cron bundle into this client. */
-  async pull(url?: string): Promise<CampoCache> {
-    const next = await CampoClient.fromBundle({
+  async pull(url?: string): Promise<CampusCache> {
+    const next = await CampusClient.fromBundle({
       url,
       mergeWith: this.cache,
       persistPath: this.persistPath,
