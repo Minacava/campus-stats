@@ -1,57 +1,58 @@
-# Esquema canónico campo-stats
+# Canonical campo-stats schema
 
-Tipos en [`src/types.ts`](../src/types.ts). Los adapters traducen campos crudos del proveedor a este esquema; el CLI y la caché no ven nombres del proveedor.
+Types live in [`src/types.ts`](../src/types.ts). Adapters translate raw
+provider fields into this schema; the CLI and cache never see provider names.
 
 ## `SourceRef`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `source` | sí | Clave del proveedor (`statsbomb`, …) |
-| `id` | sí | ID nativo del proveedor (string) |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `source` | yes | Provider key (`statsbomb`, …) |
+| `id` | yes | Native provider ID (string) |
 
 ## `Competition`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | ID estable campo-stats |
-| `name` | sí | Nombre para display / filtros CLI |
-| `gender` | sí | Siempre `"female"` en este paquete |
-| `sources` | sí | ≥1 provenance |
-| `country` | no | País o región |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | Stable campo-stats ID |
+| `name` | yes | Display name / CLI filters |
+| `gender` | yes | Always `"female"` in this package |
+| `sources` | yes | ≥1 provenance |
+| `country` | no | Country or region |
 
 ## `Season`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | |
-| `name` | sí | p. ej. `2023/2024` |
-| `competitionId` | sí | FK lógica a `Competition.id` |
-| `sources` | sí | |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | |
+| `name` | yes | e.g. `2023/2024` |
+| `competitionId` | yes | Logical FK to `Competition.id` |
+| `sources` | yes | |
 
 ## `Team`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | |
-| `name` | sí | |
-| `sources` | sí | |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | |
+| `name` | yes | |
+| `sources` | yes | |
 | `country` | no | |
 
 ## `Match`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | |
-| `competitionId` | sí | |
-| `seasonId` | sí | |
-| `homeTeamId` | sí | |
-| `awayTeamId` | sí | |
-| `sources` | sí | |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | |
+| `competitionId` | yes | |
+| `seasonId` | yes | |
+| `homeTeamId` | yes | |
+| `awayTeamId` | yes | |
+| `sources` | yes | |
 | `date` | no | `YYYY-MM-DD` |
-| `homeScore` / `awayScore` | no | `null` si no disputado / desconocido |
+| `homeScore` / `awayScore` | no | `null` if not played / unknown |
 
 ## `CampoCache`
 
-Contenedor de arrays: `competitions`, `seasons`, `teams`, `matches`,
-`identities`, `players`, `playerMatchStats`. Persistido en v0 como
+Container of arrays: `competitions`, `seasons`, `teams`, `matches`,
+`identities`, `players`, `playerMatchStats`. Persisted in v0 as
 `.campo-stats/cache.json`.
