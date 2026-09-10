@@ -18,7 +18,7 @@ FBref ofrece cobertura más amplia de ligas, pero suele ser HTML scrapeado (no A
 ## Tasks
 
 - [x] Elegir competiciones femeninas piloto en FBref (p. ej. WSL / Liga F) y documentar URLs/estructura HTML
-- [ ] Diseñar cliente HTTP con rate-limit, retries y User-Agent responsable
+- [x] Diseñar cliente HTTP con rate-limit, retries y User-Agent responsable
 - [ ] Implementar parser → entidades canónicas (sin filtrar nombres crudos de FBref al CLI)
 - [ ] Registrar provenance `sources: [{ source: "fbref", id }]`
 - [ ] Integrar el adapter en el registro de fuentes y en `sync` (sin romper el adapter StatsBomb)
