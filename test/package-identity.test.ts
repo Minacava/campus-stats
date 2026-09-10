@@ -13,16 +13,17 @@ import {
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-describe("campus package identity", () => {
-  it("publishes as campus with campus CLI bin", async () => {
+describe("campus-stats package identity", () => {
+  it("publishes as campus-stats with campus CLI bins", async () => {
     const pkg = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")) as {
       name: string;
       version: string;
       bin: Record<string, string>;
     };
-    assert.equal(pkg.name, "campus");
-    assert.ok(pkg.version.startsWith("0.3"));
+    assert.equal(pkg.name, "campus-stats");
+    assert.ok(pkg.version.startsWith("0.4"));
     assert.equal(pkg.bin.campus, "./dist/cli.js");
+    assert.equal(pkg.bin["campus-stats"], "./dist/cli.js");
     assert.equal(pkg.bin["campo-stats"], undefined);
   });
 
