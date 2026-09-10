@@ -19,8 +19,8 @@ source credits).
 
 ## Tasks
 
-- [ ] Finalize package name (`campo-stats` or scoped) and `package.json` (name, bin, exports, files)
-- [ ] Ensure reproducible build (`npm run build`) and correct CLI entrypoints
+- [x] Finalize package name (`campo-stats` or scoped) and `package.json` (name, bin, exports, files)
+- [x] Ensure reproducible build (`npm run build`) and correct CLI entrypoints
 - [ ] Consumer-oriented README (npx quickstart, supported competitions, credits)
 - [ ] Define initial semver (e.g. `0.1.0`) and what that version guarantees
 - [ ] Pre-publish checklist: license, data terms, `.npmignore` / `files`, do not ship cache or huge fixtures
