@@ -23,7 +23,7 @@ source credits).
 - [x] Ensure reproducible build (`npm run build`) and correct CLI entrypoints
 - [x] Consumer-oriented README (npx quickstart, supported competitions, credits)
 - [x] Define initial semver (e.g. `0.1.0`) and what that version guarantees
-- [ ] Pre-publish checklist: license, data terms, `.npmignore` / `files`, do not ship cache or huge fixtures
-- [ ] Test local pack (`npm pack`) and install from tarball
+- [x] Pre-publish checklist: license, data terms, `.npmignore` / `files`, do not ship cache or huge fixtures
+- [x] Test local pack (`npm pack`) and install from tarball
 - [ ] (Optional) CI pipeline: test + publish on tag
 - [ ] Publish and verify `npx campo-stats` in a clean directory
