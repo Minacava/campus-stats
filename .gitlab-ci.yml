@@ -4,6 +4,7 @@ image: node:22-bookworm
 stages:
   - test
   - release
+  - data
 
 default:
   interruptible: true
@@ -53,4 +54,47 @@ publish_gitlab_package:
       when: on_success
   environment:
     name: gitlab-packages
+    url: https://gitlab.com/marina34/campus/-/packages
+
+# Periodic fantasy data refresh (wire a Pipeline Schedule cron, e.g. 0 6 * * *).
+# See docs/cron.md.
+refresh_fantasy_data:
+  stage: data
+  script:
+    - npm ci
+    - npm run build
+    - node dist/cli.js sync --fantasy
+    - test -f .campo-stats/cache.json
+    - |
+      node -e '
+        const fs = require("fs");
+        const cache = JSON.parse(fs.readFileSync(".campo-stats/cache.json", "utf8"));
+        const meta = {
+          generatedAt: new Date().toISOString(),
+          pipelineId: process.env.CI_PIPELINE_ID || null,
+          commitSha: process.env.CI_COMMIT_SHA || null,
+          competitions: cache.competitions?.length ?? 0,
+          seasons: cache.seasons?.length ?? 0,
+          teams: cache.teams?.length ?? 0,
+          matches: cache.matches?.length ?? 0,
+          players: cache.players?.length ?? 0,
+          playerMatchStats: cache.playerMatchStats?.length ?? 0,
+        };
+        fs.writeFileSync(".campo-stats/meta.json", JSON.stringify(meta, null, 2) + "\n");
+        console.log(JSON.stringify(meta, null, 2));
+      '
+    - |
+      curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+        --upload-file ".campo-stats/cache.json" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campo-stats-data/latest/cache.json"
+    - |
+      curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+        --upload-file ".campo-stats/meta.json" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campo-stats-data/latest/meta.json"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+  environment:
+    name: fantasy-data
     url: https://gitlab.com/marina34/campus/-/packages
