@@ -3,3 +3,7 @@ dist/
 .campo-stats/
 *.tgz
 .DS_Store
+# Never commit registry auth (CI writes this with CI_JOB_TOKEN at runtime).
+.npmrc
+*.sqlite
+*.db
