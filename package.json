@@ -42,7 +42,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Minacava/campus-stats"
+    "url": "git+https://github.com/Minacava/campus-stats.git"
   },
   "homepage": "https://campus-tawny-mu.vercel.app/",
   "bugs": {
