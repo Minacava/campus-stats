@@ -59,8 +59,8 @@ SQLite.
 
 ## Estado actual
 
-Epic 00 en progreso: esquema, adapter StatsBomb, caché JSON, CLI y tests
-offline. Ver [`docs/epics/00-fundacion-v0.md`](./docs/epics/00-fundacion-v0.md).
+Epic 00 (fundación v0) implementado: esquema, StatsBomb, caché JSON, CLI,
+tests offline y docs de contribución. Siguiente: Epic 01 (FBref).
 
 ## Data source & terms
 
@@ -76,6 +76,12 @@ whoever uses this package — do not strip it out downstream.
 
 The same notice lives at the top of
 [`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
+
+## Contributing
+
+Adapters: follow the checklist in
+[`docs/contributing-adapters.md`](./docs/contributing-adapters.md)
+(`FootballSource`, normalization, provenance, terms, offline tests).
 
 ## Licencia
 

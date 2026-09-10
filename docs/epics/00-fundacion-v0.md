@@ -27,4 +27,13 @@ v0 ya está esbozado en el starter: `src/types.ts` define entidades provider-agn
 - [x] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` con filtros documentados
 - [x] Tests de contrato: sync Liga F (o fixture offline) + query de un equipo en una temporada
 - [x] Documentar términos StatsBomb y obligación de crédito en README / cabecera del adapter
-- [ ] Checklist de “contribución de adapters”: interfaz `FootballSource`, normalización, docs de límites/API keys
+- [x] Checklist de “contribución de adapters”: interfaz `FootballSource`, normalización, docs de límites/API keys
+
+## Criterios de hecho — estado
+
+Epic 00 tasks completadas. Verificar localmente:
+
+```bash
+npm install && npm run build && npm test
+node dist/cli.js sync --competition "Liga F"
+```
