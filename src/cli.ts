@@ -1,16 +1,23 @@
 #!/usr/bin/env node
+import { cachePath } from "./cache.js";
 import {
-  cachePath,
-  loadCache,
-  mergeSyncResult,
-  saveCache,
-} from "./cache.js";
+  readStore,
+  resolveDbPath,
+  resolveStoreMode,
+  runMigrate,
+  writeCacheToStore,
+  writeSyncToStore,
+  type StoreMode,
+} from "./db/store-api.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
 import { StatsBombSource } from "./sources/statsbomb.js";
 import type { FootballSource } from "./sources/types.js";
 import type { CampoCache } from "./types.js";
+
+let storeMode: StoreMode = "json";
+let dbPath = ".campo-stats/campo-stats.sqlite";
 
 function usage(): never {
   console.error(`campo-stats — women's football data CLI
@@ -27,6 +34,7 @@ Usage:
   campo-stats identities propose --competition <name>
   campo-stats identities confirm --id <identityId>
   campo-stats identities reject --id <identityId>
+  campo-stats migrate [--db <path>]
 
 Options:
   --competition <name>       Competition display name (e.g. "Liga F")
@@ -40,6 +48,9 @@ Options:
   --match <id>               Match id filter
   --status <status>          Filter identities list
   --id <identityId>          Identity id for confirm/reject
+  --sqlite                   Use SQLite store (default path .campo-stats/campo-stats.sqlite)
+  --db <path>                SQLite database path (implies --sqlite)
+  --json                     Force JSON cache (default)
   --help                     Show this help
 `);
   process.exit(1);
@@ -106,14 +117,13 @@ async function cmdSync(args: string[]): Promise<void> {
 
   console.error(`Syncing "${competition}" from ${source.id}…`);
   const result = await source.syncCompetition(competition);
-  const cache = mergeSyncResult(await loadCache(), result);
-  await saveCache(cache);
+  const cache = await writeSyncToStore(storeMode, dbPath, result);
 
   console.log(
     JSON.stringify(
       {
         source: source.id,
-        cache: cachePath(),
+        cache: storeMode === "json" ? cachePath() : dbPath,
         competition: result.competitions[0]?.name,
         seasons: result.seasons.length,
         teams: result.teams.length,
@@ -136,7 +146,7 @@ async function cmdSync(args: string[]): Promise<void> {
 }
 
 async function cmdCompetitions(): Promise<void> {
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   console.log(
     JSON.stringify(
       cache.competitions.map((c) => ({
@@ -153,7 +163,7 @@ async function cmdCompetitions(): Promise<void> {
 async function cmdSeasons(args: string[]): Promise<void> {
   const name = getFlag(args, "--competition");
   if (!name) usage();
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, name);
   const seasons = cache.seasons.filter((s) => s.competitionId === competition.id);
   console.log(
@@ -168,7 +178,7 @@ async function cmdSeasons(args: string[]): Promise<void> {
 async function cmdTeams(args: string[]): Promise<void> {
   const name = getFlag(args, "--competition");
   if (!name) usage();
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, name);
   const seasonIds = new Set(
     cache.seasons
@@ -200,7 +210,7 @@ async function cmdMatches(args: string[]): Promise<void> {
   const seasonName = getFlag(args, "--season");
   const teamName = getFlag(args, "--team");
 
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, competitionName);
   let seasonId: string | undefined;
   if (seasonName) {
@@ -253,7 +263,7 @@ async function cmdMatches(args: string[]): Promise<void> {
 async function cmdPlayers(args: string[]): Promise<void> {
   const teamName = getFlag(args, "--team");
   const name = getFlag(args, "--name");
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const teamById = new Map(cache.teams.map((t) => [t.id, t]));
   const teamIds = teamName
     ? new Set(
@@ -293,7 +303,7 @@ async function cmdPlayerStats(args: string[]): Promise<void> {
   const matchId = getFlag(args, "--match");
   const playerName = getFlag(args, "--player");
   const teamName = getFlag(args, "--team");
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
 
   let competitionId: string | undefined;
   if (competitionName) {
@@ -346,8 +356,8 @@ async function cmdIdentities(args: string[]): Promise<void> {
   if (sub === "propose") {
     const competition = getFlag(args, "--competition");
     if (!competition) usage();
-    const cache = proposeIdentitiesForCompetition(await loadCache(), competition);
-    await saveCache(cache);
+    const cache = proposeIdentitiesForCompetition(await readStore(storeMode, dbPath), competition);
+    await writeCacheToStore(storeMode, dbPath, cache);
     console.log(
       JSON.stringify(
         {
@@ -367,18 +377,18 @@ async function cmdIdentities(args: string[]): Promise<void> {
     const id = getFlag(args, "--id");
     if (!id) usage();
     const status = sub === "confirm" ? "resolved" : "rejected";
-    const before = await loadCache();
+    const before = await readStore(storeMode, dbPath);
     if (!before.identities.some((i) => i.id === id)) {
       throw new Error(`Identity not found: ${id}`);
     }
     const cache = setIdentityStatus(before, id, status);
-    await saveCache(cache);
+    await writeCacheToStore(storeMode, dbPath, cache);
     console.log(JSON.stringify(cache.identities.find((i) => i.id === id), null, 2));
     return;
   }
 
   const status = getFlag(args, "--status");
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const identities = cache.identities.filter((i) =>
     status ? i.status === status : true,
   );
@@ -388,6 +398,10 @@ async function cmdIdentities(args: string[]): Promise<void> {
 async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   if (!command || command === "--help" || args.includes("--help")) usage();
+
+  const allArgs = process.argv.slice(2);
+  storeMode = resolveStoreMode(allArgs);
+  dbPath = resolveDbPath(allArgs);
 
   switch (command) {
     case "sync":
@@ -413,6 +427,9 @@ async function main(): Promise<void> {
       break;
     case "identities":
       await cmdIdentities(args);
+      break;
+    case "migrate":
+      await runMigrate(args);
       break;
     default:
       usage();

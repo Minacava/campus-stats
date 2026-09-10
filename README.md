@@ -64,8 +64,8 @@ SQLite.
 
 ## Estado actual
 
-Epics 00–03 implementados: fundación, FBref, identidad, stats de jugadora
-(StatsBomb, `--with-players`). Siguiente: Epic 04 (SQLite).
+Epics 00–04 en curso/hechos: fundación, FBref, identidad, stats jugadora,
+SQLite (`--sqlite` / `migrate`). Siguiente: Epic 05 (npm).
 
 ## Data source & terms
 
