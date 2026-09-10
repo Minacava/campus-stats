@@ -8,6 +8,9 @@ export type { SourceRef } from "./refs.js";
  * Provider-agnostic — adapters map raw source fields into these types.
  */
 
+/** Club side vs national team (selección). */
+export type TeamKind = "club" | "national";
+
 export interface Competition {
   /** Stable campo-stats id (derived from primary source + native id). */
   id: string;
@@ -17,6 +20,8 @@ export interface Competition {
   country?: string;
   /** Always women's football in this package; kept for clarity. */
   gender: "female";
+  /** True for World Cup, Euro, etc. (national-team tournaments). */
+  international?: boolean;
   sources: SourceRef[];
 }
 
@@ -32,6 +37,8 @@ export interface Team {
   id: string;
   name: string;
   country?: string;
+  /** Club or national team when known from the competition context. */
+  kind?: TeamKind;
   sources: SourceRef[];
 }
 
