@@ -1,7 +1,7 @@
 # Contributing adapters
 
 Adapters are the easiest way into `campo-stats`: implement `FootballSource`,
-normalize into the existing schema, open a MR.
+normalize into the existing schema, open an MR.
 
 ## Checklist
 

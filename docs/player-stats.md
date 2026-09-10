@@ -1,30 +1,30 @@
 # Player & PlayerMatchStats
 
-Tipos en [`src/types.ts`](../src/types.ts).
+Types in [`src/types.ts`](../src/types.ts).
 
 ## `Player`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | p. ej. `statsbomb:player:4658` |
-| `name` | sí | Nombre completo de display |
-| `sources` | sí | Provenance |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | e.g. `statsbomb:player:4658` |
+| `name` | yes | Full display name |
+| `sources` | yes | Provenance |
 | `nickname` | no | |
 | `country` | no | |
 
 ## `PlayerMatchStats`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | Único por (match, player, source) |
-| `matchId` | sí | FK a `Match.id` |
-| `playerId` | sí | FK a `Player.id` |
-| `teamId` | sí | FK a `Team.id` |
-| `goals` | sí | Entero ≥ 0 |
-| `assists` | sí | Entero ≥ 0 |
-| `yellowCards` | sí | Entero ≥ 0 |
-| `redCards` | sí | Entero ≥ 0 |
-| `sources` | sí | |
-| `minutes` | no | Minutos jugados; `null` si desconocido |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | Unique per (match, player, source) |
+| `matchId` | yes | FK to `Match.id` |
+| `playerId` | yes | FK to `Player.id` |
+| `teamId` | yes | FK to `Team.id` |
+| `goals` | yes | Integer ≥ 0 |
+| `assists` | yes | Integer ≥ 0 |
+| `yellowCards` | yes | Integer ≥ 0 |
+| `redCards` | yes | Integer ≥ 0 |
+| `sources` | yes | |
+| `minutes` | no | Minutes played; `null` if unknown |
 
-Las métricas v1 se detallan en [`player-stats-metrics.md`](./player-stats-metrics.md).
+v1 metrics are detailed in [`player-stats-metrics.md`](./player-stats-metrics.md).

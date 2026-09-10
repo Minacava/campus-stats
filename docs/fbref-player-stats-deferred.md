@@ -1,16 +1,16 @@
-# FBref player stats — diferido en v1
+# FBref player stats — deferred in v1
 
-El adapter FBref de Epic 01 solo parsea **schedule** (`sched_*` tables).
-Las stats por jugadora en FBref viven en páginas distintas (p. ej. match
-summary / player match logs), con otro HTML y más riesgo de bloqueo.
+The Epic 01 FBref adapter only parses **schedule** (`sched_*` tables).
+Player stats on FBref live on different pages (e.g. match summary / player
+match logs), with different HTML and higher block risk.
 
-## Decisión Epic 03
+## Epic 03 decision
 
-- **StatsBomb** es la fuente v1 de `Player` / `PlayerMatchStats`.
-- **FBref → mismo schema** queda **diferido** hasta tener:
-  1. Acceso estable (sin Cloudflare en el entorno de sync), y
-  2. Fixtures HTML de una página de stats por partido.
+- **StatsBomb** is the v1 source for `Player` / `PlayerMatchStats`.
+- **FBref → same schema** is **deferred** until we have:
+  1. Stable access (no Cloudflare in the sync environment), and
+  2. HTML fixtures for a per-match stats page.
 
-No se inventan parsers sobre HTML no capturado. Cuando se retome, el mapeo
-debe emitir las mismas métricas v1 (`goals`, `assists`, `minutes`,
-`yellowCards`, `redCards`) con `sources: [{ source: "fbref", id }]`.
+Do not invent parsers over uncaptured HTML. When resumed, the mapping must
+emit the same v1 metrics (`goals`, `assists`, `minutes`, `yellowCards`,
+`redCards`) with `sources: [{ source: "fbref", id }]`.

@@ -1,38 +1,38 @@
-# Identidad cross-source
+# Cross-source identity
 
-Tipos en [`src/identity/types.ts`](../src/identity/types.ts).
+Types in [`src/identity/types.ts`](../src/identity/types.ts).
 
 ## `CanonicalIdentity`
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `id` | sí | `identity:team:…` / futuro `identity:player:…` |
-| `kind` | sí | `team` \| `player` |
-| `name` | sí | Nombre canónico de display |
-| `aliases` | sí | Lista (puede ser vacía) |
-| `sources` | sí | `SourceRef[]` de los proveedores enlazados |
-| `confidence` | sí | `high` \| `medium` \| `low` |
-| `status` | sí | `resolved` \| `pending` \| `rejected` |
-| `competitionHint` | no | Competición usada al proponer el match |
+| Field | Required | Notes |
+|-------|----------|--------|
+| `id` | yes | `identity:team:…` / future `identity:player:…` |
+| `kind` | yes | `team` \| `player` |
+| `name` | yes | Canonical display name |
+| `aliases` | yes | List (may be empty) |
+| `sources` | yes | Linked provider `SourceRef[]` |
+| `confidence` | yes | `high` \| `medium` \| `low` |
+| `status` | yes | `resolved` \| `pending` \| `rejected` |
+| `competitionHint` | no | Competition used when proposing the match |
 
-Las entidades `Team` / `Match` del schema siguen existiendo por fuente; la
-identidad es una capa de reconciliación encima, no reemplaza la provenance.
+`Team` / `Match` entities still exist per source; identity is a
+reconciliation layer on top and does not replace provenance.
 
-## Reglas v0
+## v0 rules
 
-- Auto-`resolved` solo si confidence `high` y score ≥ 0.95
-- El resto queda `pending` hasta `identities confirm` / `reject`
-- Queries de equipos por fuente no colapsan pendientes
+- Auto-`resolved` only if confidence is `high` and score ≥ 0.95
+- Everything else stays `pending` until `identities confirm` / `reject`
+- Per-source team queries do not collapse pending identities
 
-## Limitaciones conocidas
+## Known limitations
 
-- **Homónimos:** dos “United” en ligas distintas pueden parecerse; el
-  `competitionHint` reduce el riesgo pero no elimina falsos positivos.
-- **Renombres de club:** un cambio de nombre entre temporadas no hereda
-  automáticamente la identidad anterior.
-- **Transliteraciones / acentos:** se normaliza NFD y se quitan marcas, pero
-  grafías muy distintas (p. ej. abreviaturas raras) pueden quedar en `pending`.
-- **Jugadoras:** fuera de alcance hasta Epic 03 (task opcional diferida).
-- **Competiciones duplicadas:** StatsBomb y FBref crean dos `Competition`
-  “Liga F” con ids distintos; la propuesta de identidades opera sobre equipos
-  que comparten el nombre de competición en caché, no fusiona competiciones.
+- **Homonyms:** two “United” clubs in different leagues can look alike;
+  `competitionHint` reduces risk but does not eliminate false positives.
+- **Club renames:** a name change across seasons does not automatically
+  inherit the previous identity.
+- **Transliterations / accents:** NFD normalization strips marks, but very
+  different spellings (e.g. rare abbreviations) may stay `pending`.
+- **Players:** out of scope until Epic 03 (optional task deferred).
+- **Duplicate competitions:** StatsBomb and FBref create two `Competition`
+  rows named “Liga F” with different ids; identity proposals operate on teams
+  that share a competition name in cache and do not merge competitions.

@@ -1,33 +1,36 @@
-# Epic 02 — Resolución de identidad cross-source
+# Epic 02 — Cross-source identity resolution
 
-## Objetivo
+## Goal
 
-Unificar equipos (y, cuando exista el modelo, jugadoras) que aparecen con IDs distintos en StatsBomb y FBref en una identidad canónica consultable.
+Unify teams (and, once the model exists, players) that appear under different
+IDs in StatsBomb and FBref into one queryable canonical identity.
 
-## Contexto
+## Context
 
-Cada entidad ya lleva `sources[]` con provenance. Con dos fuentes, el mismo equipo puede figurar dos veces. La resolución se apoya en fuzzy name + aliases + contexto (competición/temporada), sin tirar la provenance.
+Every entity already carries `sources[]` provenance. With two sources, the
+same club can appear twice. Resolution leans on fuzzy name + aliases +
+context (competition/season) without dropping provenance.
 
-**Dependencia:** Epic 01 (hace falta ≥2 fuentes para reconciliar de verdad).
+**Dependency:** Epic 01 (≥2 sources to reconcile for real).
 
-## Criterios de hecho
+## Definition of done
 
-- Hay un modelo de identidad canónica (ID interno + aliases / source IDs)
-- Un flujo de matching produce enlaces o candidatos revisables
-- Las queries CLI pueden resolver por nombre canónico sin duplicar equipos “obvios”
-- Casos ambiguos no se fusionan a ciegas (confianza / revisión)
+- A canonical identity model exists (internal ID + aliases / source IDs)
+- A matching flow produces links or reviewable candidates
+- CLI queries can resolve by canonical name without duplicating “obvious” teams
+- Ambiguous cases are not merged blindly (confidence / review)
 
 ## Tasks
 
-- [x] Diseñar modelo: canonical ID, aliases, enlaces a `sources[]`, nivel de confianza
-- [x] Implementar matching de equipos (nombre normalizado + competición/temporada)
-- [x] Definir reglas: auto-merge vs candidato pendiente de revisión
-- [x] Persistir resoluciones en caché (o tabla dedicada si ya hay SQLite)
-- [x] Exponer en CLI: listar duplicados / identidades y, si aplica, confirmar/rechazar matches
-- [x] Fixtures con conflictos reales (mismo club, nombres distintos entre StatsBomb y FBref)
-- [x] Documentar limitaciones (homónimos, renombres de club, transliteraciones)
-- [x] ~~(Opcional, si Epic 03 avanzó) Extender el mismo enfoque a jugadoras~~ — diferido hasta Epic 03
+- [x] Design model: canonical ID, aliases, `sources[]` links, confidence level
+- [x] Implement team matching (normalized name + competition/season)
+- [x] Define rules: auto-merge vs pending review candidate
+- [x] Persist resolutions in the cache (or a dedicated table once SQLite exists)
+- [x] Expose in CLI: list duplicates / identities and, if applicable, confirm/reject matches
+- [x] Fixtures with real conflicts (same club, different names across StatsBomb and FBref)
+- [x] Document limitations (homonyms, club renames, transliterations)
+- [x] ~~(Optional, if Epic 03 advanced) Extend the same approach to players~~ — deferred until Epic 03
 
-## Criterios de hecho — estado
+## Definition of done — status
 
-Epic 02 (equipos) completado. Jugadoras quedan para después de Epic 03.
+Epic 02 (teams) complete. Players remain after Epic 03.

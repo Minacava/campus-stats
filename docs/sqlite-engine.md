@@ -1,22 +1,22 @@
-# Persistencia SQLite — elección de motor
+# SQLite persistence — engine choice
 
-## Decisión
+## Decision
 
-Usar **`node:sqlite`** (módulo built-in de Node.js).
+Use **`node:sqlite`** (built-in Node.js module).
 
-| Criterio | `node:sqlite` | `better-sqlite3` |
-|----------|---------------|------------------|
-| Dependencia nativa extra | No | Sí (compile / prebuilds) |
-| Node requerido | **≥ 22.5** (stable-ish; flag experimental historico) / documentamos **≥ 22** | ≥ 18 típico |
-| Sync API | Sí (`DatabaseSync`) | Sí |
-| Empaquetado npm | Más simple para CLI | Más fricción en install |
+| Criterion | `node:sqlite` | `better-sqlite3` |
+|-----------|---------------|------------------|
+| Extra native dependency | No | Yes (compile / prebuilds) |
+| Node required | **≥ 22.5** (historically experimental; we document **≥ 22**) | ≥ 18 typical |
+| Sync API | Yes (`DatabaseSync`) | Yes |
+| npm packaging | Simpler for CLI | More install friction |
 
-## Requisitos
+## Requirements
 
-- **Node.js ≥ 22** (alineado con el runtime del agente; `package.json` engines se actualiza).
-- Sin binarios nativos adicionales → mejor DX en `npx campo-stats`.
+- **Node.js ≥ 22** (aligned with the agent runtime; `package.json` engines updated).
+- No extra native binaries → better DX for `npx campo-stats`.
 
-## Nota
+## Note
 
-Si en algún entorno `node:sqlite` no estuviera disponible, el fallback documentado
-es mantener la caché JSON (legacy) hasta que el runtime cumpla el mínimo.
+If `node:sqlite` is unavailable in an environment, the documented fallback is
+to keep the legacy JSON cache until the runtime meets the minimum.

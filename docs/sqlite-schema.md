@@ -1,7 +1,7 @@
 # SQL schema (node:sqlite)
 
-Tablas alineadas al dominio canónico. Los JSON de `sources` / `aliases` se
-guardan como TEXT JSON para no explotar filas de provenance en v1.
+Tables aligned to the canonical domain. `sources` / `aliases` JSON is stored
+as TEXT JSON so provenance does not explode into many rows in v1.
 
 ```sql
 CREATE TABLE IF NOT EXISTS competitions (
