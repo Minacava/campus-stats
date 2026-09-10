@@ -1,17 +1,12 @@
 import type { CanonicalIdentity } from "./identity/types.js";
+import type { SourceRef } from "./refs.js";
+
+export type { SourceRef } from "./refs.js";
 
 /**
  * Canonical domain schema for campo-stats.
  * Provider-agnostic — adapters map raw source fields into these types.
  */
-
-/** Provenance link back to an upstream provider record. */
-export interface SourceRef {
-  /** Provider key, e.g. "statsbomb", "fbref". */
-  source: string;
-  /** Provider-native identifier (stringified if numeric upstream). */
-  id: string;
-}
 
 export interface Competition {
   /** Stable campo-stats id (derived from primary source + native id). */

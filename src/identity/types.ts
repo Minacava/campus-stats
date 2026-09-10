@@ -6,7 +6,7 @@
  * decide whether the link is safe to auto-apply in queries.
  */
 
-import type { SourceRef } from "./types.js";
+import type { SourceRef } from "../refs.js";
 
 export type IdentityKind = "team" | "player";
 

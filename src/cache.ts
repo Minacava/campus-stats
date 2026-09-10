@@ -60,5 +60,6 @@ export function mergeSyncResult(cache: CampoCache, result: SyncResult): CampoCac
     seasons: mergeById<Season>(cache.seasons, result.seasons),
     teams: mergeById<Team>(cache.teams, result.teams),
     matches: mergeById<Match>(cache.matches, result.matches),
+    identities: cache.identities,
   };
 }
