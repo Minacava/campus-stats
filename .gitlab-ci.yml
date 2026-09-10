@@ -1,4 +1,4 @@
-# Build and test campus on every MR / push
+# Build and test campus-stats on every MR / push
 image: node:22-bookworm
 
 stages:
@@ -27,8 +27,31 @@ test:
     - if: $CI_COMMIT_BRANCH
     - if: $CI_COMMIT_TAG
 
-# Publish to this project's GitLab Package Registry (not npmjs.com).
-# Runs on version tags: v0.1.0, v1.2.3, …
+# Publish to the public npm registry (npmjs.com).
+# Requires CI/CD variable NPM_TOKEN (Automation token, masked + protected).
+# Runs on version tags: v0.4.0, v1.2.3, …
+publish_npmjs:
+  stage: release
+  needs: ["test"]
+  script:
+    - npm ci
+    - npm run build
+    - npm pack
+    - |
+      if [ -z "${NPM_TOKEN:-}" ]; then
+        echo "NPM_TOKEN is not set. Add a masked+protected CI/CD variable (npm Automation token)."
+        exit 1
+      fi
+    - printf '%s\n' "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+    - npm publish --access public
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+      when: on_success
+  environment:
+    name: npmjs
+    url: https://www.npmjs.com/package/campus-stats
+
+# Also mirror to this project's GitLab Package Registry.
 publish_gitlab_package:
   stage: release
   needs: ["test"]
@@ -47,8 +70,8 @@ publish_gitlab_package:
     # Also upload the tarball to the Generic Package Registry for direct download.
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file "campus-${CI_COMMIT_TAG#v}.tgz" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campus/${CI_COMMIT_TAG#v}/campus-${CI_COMMIT_TAG#v}.tgz"
+        --upload-file "campus-stats-${CI_COMMIT_TAG#v}.tgz" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campus-stats/${CI_COMMIT_TAG#v}/campus-stats-${CI_COMMIT_TAG#v}.tgz"
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
       when: on_success

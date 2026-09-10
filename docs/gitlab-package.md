@@ -1,66 +1,44 @@
-# Install campus from GitLab (not npmjs)
+# Optional: GitLab Package Registry mirror
 
-This project does **not** publish to the public npm registry. Packages are
-hosted on **GitLab Package Registry** for [marina34/campus](https://gitlab.com/marina34/campus).
+Primary distribution is **npmjs.com** (`npm install campus-stats`).  
+This project also mirrors the same package to the **GitLab Package Registry**.
 
+Packages: https://gitlab.com/marina34/campus/-/packages  
 Project ID: `86296665`
 
-## Option A — npm install from the project registry
+## Install from GitLab (optional)
 
 ```bash
-npm install campus \
+npm install campus-stats \
   --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
-Or add to your project `.npmrc`:
+Or with a project `.npmrc`:
 
 ```ini
 registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
-Then:
+### If you get 401 Unauthorized
+
+Enable **Allow anyone to pull from Package Registry** under  
+**Settings → General → Visibility**, or set the project to **Public**.
+
+With a private registry, add a GitLab token:
+
+```ini
+registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
+//gitlab.com/api/v4/projects/86296665/packages/npm/:_authToken=YOUR_GITLAB_TOKEN
+```
+
+## Generic tarball
 
 ```bash
-npm install campus
-npx campus --help
+npm install \
+  https://gitlab.com/api/v4/projects/86296665/packages/generic/campus-stats/0.4.0/campus-stats-0.4.0.tgz
 ```
 
-> Packages appear under **Deploy → Package registry** after a version tag
-> pipeline runs (`v0.1.0`, …).
+## How maintainers publish
 
-## Option B — download the tarball (Generic Package Registry)
-
-After a tagged release, the CI job also uploads:
-
-```text
-https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
-```
-
-Install from that URL (public project) or download and install locally:
-
-```bash
-npm install https://gitlab.com/api/v4/projects/86296665/packages/generic/campus/0.3.0/campus-0.3.0.tgz
-```
-
-## Option C — clone and build
-
-```bash
-git clone https://gitlab.com/marina34/campus.git
-cd campus
-npm install
-npm run build
-node dist/cli.js --help
-```
-
-## How maintainers publish a version
-
-```bash
-# on main, after merge
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-CI runs tests, then `publish_gitlab_package` pushes to this project's
-Package Registry using `CI_JOB_TOKEN` (no npmjs credentials).
-
-Browse packages: https://gitlab.com/marina34/campus/-/packages
+Tagging `vX.Y.Z` runs both `publish_npmjs` and `publish_gitlab_package`.  
+See [`docs/npm.md`](./npm.md).
