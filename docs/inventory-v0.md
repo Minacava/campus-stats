@@ -7,16 +7,15 @@ Proyecto: Campus / `campo-stats` (`marina34/campus`)
 
 | Área | Estado |
 |------|--------|
-| `src/types.ts` | No existe — pendiente Epic 00 task esquema |
-| `src/sources/` | No existe — pendiente adapter StatsBomb |
-| CLI | No existe |
-| Caché JSON | No existe |
-| `package.json` / build | No existe |
+| `src/types.ts` | Hecho — esquema canónico |
+| `src/sources/` | Hecho — `FootballSource` + StatsBomb |
+| CLI | Hecho — `src/cli.ts` |
+| Caché JSON | Hecho — `src/cache.ts` |
+| `package.json` / build | Hecho — `npm run build` / `npm test` |
 | Epics | `docs/epics/` (00–05) |
-| README | Visión Campus + enlace a epics |
+| README | Visión Campus + quickstart + términos |
 
 ## Conclusión
 
-El repo es **greenfield** respecto al código del paquete. El diseño de referencia está en los epics y en la visión del README (esquema canónico, adapters `FootballSource`, caché JSON merge, CLI sync/query, StatsBomb como primera fuente).
-
-Las siguientes tasks del Epic 00 crean esa base en orden: tipos → adapter → caché → CLI → tests → docs de términos → checklist de contribución.
+La fundación v0 del paquete está en el árbol de código. Continuar con
+Epic 01 (adapter FBref) y siguientes según `docs/epics/`.
