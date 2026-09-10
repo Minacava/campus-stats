@@ -1,6 +1,6 @@
 {
   "name": "campus-stats",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Campus — installable women's football data layer for apps (clubs, national teams, matches, fantasy points)",
   "type": "module",
   "main": "./dist/index.js",
@@ -42,11 +42,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/marina34/campus.git"
+    "url": "git+https://gitlab.com/marina34/campus-docs.git"
   },
-  "homepage": "https://gitlab.com/marina34/campus",
+  "homepage": "https://marina34.gitlab.io/campus-docs/",
   "bugs": {
-    "url": "https://gitlab.com/marina34/campus/-/issues"
+    "url": "https://gitlab.com/marina34/campus-docs/-/issues"
   },
   "license": "MIT",
   "devDependencies": {
