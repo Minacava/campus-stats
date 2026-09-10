@@ -25,7 +25,21 @@ Initial repo inventory: [`docs/inventory-v0.md`](./docs/inventory-v0.md).
 | [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
 | [05 — npm](./docs/epics/05-publicacion-npm.md) | Package publication |
 
-## Quickstart (v0 target)
+## Install
+
+```bash
+# one-shot (after publish)
+npx campo-stats sync --competition "Liga F"
+
+# or add as a dependency
+npm install campo-stats
+```
+
+Requires **Node.js ≥ 22**.
+
+## Quickstart
+
+From a clone (development):
 
 ```bash
 npm install
@@ -49,7 +63,12 @@ node dist/cli.js sync --competition "Liga F" --sqlite
 node dist/cli.js competitions --sqlite
 ```
 
-Once published: `npx campo-stats sync ...` without cloning the repo.
+Supported StatsBomb women's competitions include Liga F, FA Women's Super
+League, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, and UEFA
+Women's Euro. FBref pilots: WSL and Liga F (`--source fbref`).
+
+Version guarantees: [`docs/versioning.md`](./docs/versioning.md). Changelog:
+[`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Why this shape
 
@@ -68,8 +87,8 @@ SQLite.
 
 ## Current status
 
-Epics 00–04 done: foundation, FBref, identity, player stats, SQLite
-(`--sqlite` / `migrate`). Next: Epic 05 (npm).
+Epics 00–04 done. Epic 05 (npm publish) in progress — package metadata at
+`0.1.0`.
 
 ## Data source & terms
 

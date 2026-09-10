@@ -21,8 +21,8 @@ source credits).
 
 - [x] Finalize package name (`campo-stats` or scoped) and `package.json` (name, bin, exports, files)
 - [x] Ensure reproducible build (`npm run build`) and correct CLI entrypoints
-- [ ] Consumer-oriented README (npx quickstart, supported competitions, credits)
-- [ ] Define initial semver (e.g. `0.1.0`) and what that version guarantees
+- [x] Consumer-oriented README (npx quickstart, supported competitions, credits)
+- [x] Define initial semver (e.g. `0.1.0`) and what that version guarantees
 - [ ] Pre-publish checklist: license, data terms, `.npmignore` / `files`, do not ship cache or huge fixtures
 - [ ] Test local pack (`npm pack`) and install from tarball
 - [ ] (Optional) CI pipeline: test + publish on tag
