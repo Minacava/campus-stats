@@ -1,0 +1,722 @@
+[
+  {
+    "match_id": 3911515,
+    "match_date": "2024-03-24",
+    "kick_off": "17:00:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 3282,
+      "home_team_name": "Real Madrid CF W",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000866,
+          "name": "Jos\u00e9 Alberto Toril Rodr\u00edguez",
+          "nickname": "Alberto Toril",
+          "dob": "1973-07-07",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 937,
+      "away_team_name": "Barcelona WFC",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 0,
+    "away_score": 3,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2026-04-10T16:07:31.278848",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 21,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5341,
+      "name": "Estadio Alfredo Di St\u00e9fano",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 2235,
+      "name": "Olatz Rivera Olmedo",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3910954,
+    "match_date": "2023-10-15",
+    "kick_off": "16:30:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 1105,
+      "home_team_name": "Atletico Madrid W",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 5494,
+          "name": "Manuel Jes\u00fas Cano Mart\u00edn",
+          "nickname": "Manolo Cano",
+          "dob": "1975-08-26",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 937,
+      "away_team_name": "Barcelona WFC",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 0,
+    "away_score": 1,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2026-04-08T01:40:16.429451",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 5,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5054,
+      "name": "Centro Deportivo Alcal\u00e1 de Henares",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1545,
+      "name": "Zulema Gonz\u00e1lez Gonz\u00e1lez",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911562,
+    "match_date": "2024-05-10",
+    "kick_off": "21:30:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 937,
+      "home_team_name": "Barcelona WFC",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 3270,
+      "away_team_name": "Athletic Club Bilbao",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 5275,
+          "name": "David Aznar Chicharro",
+          "nickname": "David Aznar",
+          "dob": "1980-03-09",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 7,
+    "away_score": 0,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-05-11T08:41:03.578251",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 27,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5052,
+      "name": "Estadi Johan Cruyff",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 2233,
+      "name": "Elena Arnillas",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911528,
+    "match_date": "2024-04-13",
+    "kick_off": "18:30:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 937,
+      "home_team_name": "Barcelona WFC",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 6604,
+      "away_team_name": "Villarreal",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000496,
+          "name": "Sara Monforte Mestre",
+          "nickname": null,
+          "dob": "1980-10-14",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 5,
+    "away_score": 1,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-04-14T09:49:53.563746",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 23,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5052,
+      "name": "Estadi Johan Cruyff",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1007168,
+      "name": "Andrea Fern\u00e1ndez Firvida",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911556,
+    "match_date": "2024-05-04",
+    "kick_off": "21:30:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 18938,
+      "home_team_name": "Granada W",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1003701,
+          "name": "Roger Lamesa Grau",
+          "nickname": "Roger Lamesa",
+          "dob": "1990-08-06",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 937,
+      "away_team_name": "Barcelona WFC",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 1,
+    "away_score": 4,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-06-13T08:49:59.043666",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 26,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 4667,
+      "name": "Estadio Nuevo Los C\u00e1rmenes",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1007243,
+      "name": "Mar\u00eda Planes Terol",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911504,
+    "match_date": "2024-03-17",
+    "kick_off": "15:00:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 937,
+      "home_team_name": "Barcelona WFC",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 3269,
+      "away_team_name": "Costa Adeje Tenerife",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1002140,
+          "name": "Jos\u00e9 \u00c1ngel Herrera Martin",
+          "nickname": "Jos\u00e9 Herrera",
+          "dob": "1989-12-18",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 7,
+    "away_score": 0,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-03-18T04:13:16.063485",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 20,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5052,
+      "name": "Estadi Johan Cruyff",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1003567,
+      "name": "Patricia Luna Varo",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911498,
+    "match_date": "2024-03-10",
+    "kick_off": "15:00:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 3272,
+      "home_team_name": "Real Sociedad de F\u00fatbol",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 5300,
+          "name": "Natalia Arroyo",
+          "nickname": null,
+          "dob": "1986-04-14",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 937,
+      "away_team_name": "Barcelona WFC",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 1,
+    "away_score": 7,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-03-11T05:14:03.765284",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 19,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 117140,
+      "name": "Instalaciones de Zubieta",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1007168,
+      "name": "Andrea Fern\u00e1ndez Firvida",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  },
+  {
+    "match_id": 3911472,
+    "match_date": "2024-02-04",
+    "kick_off": "19:00:00.000",
+    "competition": {
+      "competition_id": 182,
+      "country_name": "Spain",
+      "competition_name": "Liga F"
+    },
+    "season": {
+      "season_id": 281,
+      "season_name": "2023/2024"
+    },
+    "home_team": {
+      "home_team_id": 937,
+      "home_team_name": "Barcelona WFC",
+      "home_team_gender": "female",
+      "home_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1000465,
+          "name": "Jonatan Gir\u00e1ldez Costas",
+          "nickname": "Jonatan Gir\u00e1ldez",
+          "dob": "1991-11-27",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "away_team": {
+      "away_team_id": 3280,
+      "away_team_name": "CD Sporting de Huelva",
+      "away_team_gender": "female",
+      "away_team_group": null,
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      },
+      "managers": [
+        {
+          "id": 1004126,
+          "name": "Juan Manuel Rosado Mojarro",
+          "nickname": "Juan Mojarro",
+          "dob": "1974-04-24",
+          "country": {
+            "id": 214,
+            "name": "Spain"
+          }
+        }
+      ]
+    },
+    "home_score": 4,
+    "away_score": 0,
+    "match_status": "available",
+    "match_status_360": "unscheduled",
+    "last_updated": "2024-05-21T13:50:23.228710",
+    "last_updated_360": null,
+    "metadata": {
+      "data_version": "1.1.0",
+      "shot_fidelity_version": "2",
+      "xy_fidelity_version": "2"
+    },
+    "match_week": 16,
+    "competition_stage": {
+      "id": 1,
+      "name": "Regular Season"
+    },
+    "stadium": {
+      "id": 5052,
+      "name": "Estadi Johan Cruyff",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    },
+    "referee": {
+      "id": 1287,
+      "name": "Elia Mar\u00eda Mart\u00ednez Mart\u00ednez",
+      "country": {
+        "id": 214,
+        "name": "Spain"
+      }
+    }
+  }
+]

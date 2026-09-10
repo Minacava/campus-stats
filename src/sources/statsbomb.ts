@@ -46,7 +46,18 @@ interface SbMatch {
   };
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
+function normalizeName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+export interface StatsBombSourceOptions {
+  /** Override open-data root (default: GitHub raw master/data). */
+  baseUrl?: string;
+  /** Inject fetch for offline fixtures / tests. */
+  fetchJson?: <T>(url: string) => Promise<T>;
+}
+
+async function defaultFetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`StatsBomb fetch failed (${res.status}): ${url}`);
@@ -54,15 +65,20 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await res.json()) as T;
 }
 
-function normalizeName(name: string): string {
-  return name.trim().toLowerCase();
-}
-
 export class StatsBombSource implements FootballSource {
   readonly id = SOURCE;
+  private readonly baseUrl: string;
+  private readonly fetchJson: <T>(url: string) => Promise<T>;
+
+  constructor(options: StatsBombSourceOptions = {}) {
+    this.baseUrl = options.baseUrl ?? BASE;
+    this.fetchJson = options.fetchJson ?? defaultFetchJson;
+  }
 
   async syncCompetition(competitionName: string): Promise<SyncResult> {
-    const all = await fetchJson<SbCompetition[]>(`${BASE}/competitions.json`);
+    const all = await this.fetchJson<SbCompetition[]>(
+      `${this.baseUrl}/competitions.json`,
+    );
     const rows = all.filter(
       (c) =>
         c.competition_gender === "female" &&
@@ -116,8 +132,8 @@ export class StatsBombSource implements FootballSource {
         ],
       });
 
-      const matchRows = await fetchJson<SbMatch[]>(
-        `${BASE}/matches/${row.competition_id}/${row.season_id}.json`,
+      const matchRows = await this.fetchJson<SbMatch[]>(
+        `${this.baseUrl}/matches/${row.competition_id}/${row.season_id}.json`,
       );
 
       for (const m of matchRows) {

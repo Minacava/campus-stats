@@ -25,6 +25,6 @@ v0 ya está esbozado en el starter: `src/types.ts` define entidades provider-agn
 - [x] Completar / endurecer el adapter StatsBomb (`FootballSource`) con mapeo estable y provenance `sources`
 - [x] Implementar caché JSON en `.campo-stats/cache.json` con merge por sync (no replace)
 - [x] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` con filtros documentados
-- [ ] Tests de contrato: sync Liga F (o fixture offline) + query de un equipo en una temporada
+- [x] Tests de contrato: sync Liga F (o fixture offline) + query de un equipo en una temporada
 - [ ] Documentar términos StatsBomb y obligación de crédito en README / cabecera del adapter
 - [ ] Checklist de “contribución de adapters”: interfaz `FootballSource`, normalización, docs de límites/API keys
