@@ -59,10 +59,25 @@ SQLite.
 
 ## Estado actual
 
-Código del paquete aún no aterrizado (ver inventario). El trabajo
-comienza por el Epic 00.
+Epic 00 en progreso: esquema, adapter StatsBomb, caché JSON, CLI y tests
+offline. Ver [`docs/epics/00-fundacion-v0.md`](./docs/epics/00-fundacion-v0.md).
+
+## Data source & terms
+
+v0 ships one adapter: [StatsBomb Open Data](https://github.com/statsbomb/open-data),
+covering Liga F, FA Women's Super League, Frauen-Bundesliga, Serie A Women,
+NWSL, Women's World Cup, and UEFA Women's Euro (women's competitions only).
+
+**This code is MIT. The data is not ours to relicense.** StatsBomb makes it
+free for research and genuine football-analytics use. If you publish analysis
+built on it, credit StatsBomb (see their
+[media pack](https://statsbomb.com/media-pack/)). Pass that requirement on to
+whoever uses this package — do not strip it out downstream.
+
+The same notice lives at the top of
+[`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
 
 ## Licencia
 
-Código: MIT. Datos: sujetos a los términos de cada fuente (crédito a
-StatsBomb en análisis publicados — ver Epic 00 / sección de datos).
+Código: MIT (ver [`LICENSE`](./LICENSE)). Datos: sujetos a los términos de
+cada fuente — ver [Data source & terms](#data-source--terms).
