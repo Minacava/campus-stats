@@ -1,45 +1,44 @@
-# FBref — competiciones piloto y estructura HTML
+# FBref — pilot competitions and HTML shape
 
-## Pilotos
+## Pilots
 
-| Competición | FBref comp id | Schedule URL (patrón) |
+| Competition | FBref comp id | Schedule URL (pattern) |
 |-------------|---------------|------------------------|
 | FA Women's Super League | `189` | `/en/comps/189/schedule/Womens-Super-League-Scores-and-Fixtures` |
 | Liga F | `230` | `/en/comps/230/schedule/Liga-F-Scores-and-Fixtures` |
 
-Temporada en path opcional: `/en/comps/189/2023-2024/schedule/2023-2024-Womens-Super-League-Scores-and-Fixtures`.
+Optional season in path: `/en/comps/189/2023-2024/schedule/2023-2024-Womens-Super-League-Scores-and-Fixtures`.
 
-v1 del adapter usa **WSL (`189`)** como piloto por defecto al pedir
-`sync --source fbref --competition "FA Women's Super League"` (y alias `WSL`).
+v1 of the adapter uses **WSL (`189`)** as the default pilot when requesting
+`sync --source fbref --competition "FA Women's Super League"` (and alias `WSL`).
 
-## Estructura HTML esperada
+## Expected HTML structure
 
-FBref renderiza una tabla de fixtures con `data-stat` estables:
+FBref renders a fixtures table with stable `data-stat` attributes:
 
-- Tabla: `table.stats_table` cuyo `id` empieza por `sched_`
-- Filas de partido en `tbody > tr` (ignorar filas de spacer / thead)
-- Celdas relevantes:
-  - `data-stat="date"` — texto o link `YYYY-MM-DD`
+- Table: `table.stats_table` whose `id` starts with `sched_`
+- Match rows in `tbody > tr` (ignore spacer / thead rows)
+- Relevant cells:
+  - `data-stat="date"` — text or link `YYYY-MM-DD`
   - `data-stat="home_team"` — link `/en/squads/<id>/...`
-  - `data-stat="score"` — texto tipo `1–2` (en-dash) o vacío si no jugado
+  - `data-stat="score"` — text like `1–2` (en-dash) or empty if not played
   - `data-stat="away_team"` — link `/en/squads/<id>/...`
 
-El parser de `campo-stats` solo lee esos `data-stat`; no depende de clases CSS
-volátiles.
+The `campo-stats` parser only reads those `data-stat` values; it does not
+depend on volatile CSS classes.
 
-## Acceso desde este entorno
+## Access from this environment
 
-Las peticiones HTTP a `fbref.com` desde el agente Cloud reciben **403 Cloudflare
-(“Just a moment…”)**. Por eso:
+HTTP requests to `fbref.com` from the Cloud agent receive **403 Cloudflare
+(“Just a moment…”)**. Therefore:
 
-- CI y tests usan **fixtures HTML** bajo `test/fixtures/fbref/`
-- El cliente HTTP real queda listo (rate-limit + UA) para máquinas que no estén
-  bloqueadas
-- No se versionan dumps enormes; solo un schedule mínimo de WSL
+- CI and tests use **HTML fixtures** under `test/fixtures/fbref/`
+- The real HTTP client remains ready (rate-limit + UA) for unblocked machines
+- We do not version huge dumps; only a minimal WSL schedule sample
 
-## Términos
+## Terms
 
-Datos y marca de [FBref / Sports Reference](https://www.fbref.com/). Respetar
-`robots.txt`, rate limits y condiciones de uso del sitio. Este paquete no
-redistribuye dumps masivos de FBref; solo normaliza lo que la usuaria sincroniza
-localmente.
+Data and branding belong to [FBref / Sports Reference](https://www.fbref.com/).
+Respect `robots.txt`, rate limits, and site terms of use. This package does
+not redistribute bulk FBref dumps; it only normalizes what the user syncs
+locally.

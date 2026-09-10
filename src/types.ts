@@ -1,5 +1,5 @@
-import type { CanonicalIdentity } from "./identity/types.js";
 import type { SourceRef } from "./refs.js";
+import type { CanonicalIdentity } from "./identity/types.js";
 
 export type { SourceRef } from "./refs.js";
 
@@ -48,6 +48,34 @@ export interface Match {
   sources: SourceRef[];
 }
 
+/** Player identity at package level (not per-match). */
+export interface Player {
+  id: string;
+  name: string;
+  /** Preferred short name when known. */
+  nickname?: string;
+  country?: string;
+  sources: SourceRef[];
+}
+
+/**
+ * Aggregated per-player stats for a single match (v1 metrics subset).
+ * See docs/player-stats.md for the metric contract.
+ */
+export interface PlayerMatchStats {
+  id: string;
+  matchId: string;
+  playerId: string;
+  teamId: string;
+  /** Minutes played when known. */
+  minutes?: number | null;
+  goals: number;
+  assists: number;
+  yellowCards: number;
+  redCards: number;
+  sources: SourceRef[];
+}
+
 /** In-memory / on-disk cache shape (JSON file in v0). */
 export interface CampoCache {
   competitions: Competition[];
@@ -56,4 +84,6 @@ export interface CampoCache {
   matches: Match[];
   /** Cross-source identity resolutions (epic 02). */
   identities: CanonicalIdentity[];
+  players: Player[];
+  playerMatchStats: PlayerMatchStats[];
 }
