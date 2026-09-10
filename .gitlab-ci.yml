@@ -1,0 +1,25 @@
+# Build and test campo-stats on every MR / push
+image: node:22-bookworm
+
+stages:
+  - test
+
+default:
+  interruptible: true
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm run build
+    - npm test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
