@@ -5,6 +5,8 @@ import {
   mergeSyncResult,
   saveCache,
 } from "./cache.js";
+import { proposeIdentitiesForCompetition } from "./identity/propose.js";
+import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
 import { StatsBombSource } from "./sources/statsbomb.js";
 import type { FootballSource } from "./sources/types.js";
@@ -19,12 +21,18 @@ Usage:
   campo-stats seasons --competition <name>
   campo-stats teams --competition <name>
   campo-stats matches --competition <name> [--season <name>] [--team <name>]
+  campo-stats identities [--status resolved|pending|rejected]
+  campo-stats identities propose --competition <name>
+  campo-stats identities confirm --id <identityId>
+  campo-stats identities reject --id <identityId>
 
 Options:
   --competition <name>  Competition display name (e.g. "Liga F")
   --source <id>         Data source for sync (default: statsbomb)
   --season <name>       Season label (e.g. "2023/2024")
   --team <name>         Team name substring (case-insensitive)
+  --status <status>     Filter identities list
+  --id <identityId>     Identity id for confirm/reject
   --help                Show this help
 `);
   process.exit(1);
@@ -216,6 +224,50 @@ async function cmdMatches(args: string[]): Promise<void> {
   );
 }
 
+async function cmdIdentities(args: string[]): Promise<void> {
+  const sub = args[0];
+  if (sub === "propose") {
+    const competition = getFlag(args, "--competition");
+    if (!competition) usage();
+    const cache = proposeIdentitiesForCompetition(await loadCache(), competition);
+    await saveCache(cache);
+    console.log(
+      JSON.stringify(
+        {
+          competition,
+          identities: cache.identities.length,
+          pending: cache.identities.filter((i) => i.status === "pending").length,
+          resolved: cache.identities.filter((i) => i.status === "resolved").length,
+        },
+        null,
+        2,
+      ),
+    );
+    return;
+  }
+
+  if (sub === "confirm" || sub === "reject") {
+    const id = getFlag(args, "--id");
+    if (!id) usage();
+    const status = sub === "confirm" ? "resolved" : "rejected";
+    const before = await loadCache();
+    if (!before.identities.some((i) => i.id === id)) {
+      throw new Error(`Identity not found: ${id}`);
+    }
+    const cache = setIdentityStatus(before, id, status);
+    await saveCache(cache);
+    console.log(JSON.stringify(cache.identities.find((i) => i.id === id), null, 2));
+    return;
+  }
+
+  const status = getFlag(args, "--status");
+  const cache = await loadCache();
+  const identities = cache.identities.filter((i) =>
+    status ? i.status === status : true,
+  );
+  console.log(JSON.stringify(identities, null, 2));
+}
+
 async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   if (!command || command === "--help" || args.includes("--help")) usage();
@@ -235,6 +287,9 @@ async function main(): Promise<void> {
       break;
     case "matches":
       await cmdMatches(args);
+      break;
+    case "identities":
+      await cmdIdentities(args);
       break;
     default:
       usage();
