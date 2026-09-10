@@ -9,7 +9,7 @@ export type {
   PlayerMatchStats,
   LineupEntry,
   InjuryRecord,
-  CampoCache,
+  CampusCache,
 } from "./types.js";
 export type {
   IdentityKind,
@@ -47,7 +47,7 @@ export {
   dataBundleUrl,
   dataBundleMetaUrl,
 } from "./data-bundle.js";
-export { CampoClient } from "./client.js";
+export { CampusClient } from "./client.js";
 export type { SquadMember } from "./client.js";
 export {
   DEFAULT_FANTASY_RULES,

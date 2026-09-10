@@ -2,7 +2,7 @@
 
 ## Goal
 
-Replace `.campo-stats/cache.json` with SQLite when volume (especially events /
+Replace `.campus/cache.json` with SQLite when volume (especially events /
 player stats) makes loading everything into memory impractical, without
 breaking the sync/query flow.
 
@@ -33,7 +33,7 @@ being viable** — that is the trigger for this epic. See
 - [x] Choose engine (`node:sqlite` vs `better-sqlite3`) and document Node/OS requirements
 - [x] Design SQL schema aligned to Competition / Season / Team / Match (+ Player if applicable)
 - [x] Implement repository layer (CLI and adapters do not speak raw SQL)
-- [x] Migration / import from `.campo-stats/cache.json`
+- [x] Migration / import from `.campus/cache.json`
 - [x] Keep semantic merge on sync (upsert by identity / provenance)
 - [x] CLI flags for DB path and, if needed, legacy JSON mode
 - [x] Migration tests and representative queries

@@ -24,7 +24,7 @@ describe("HttpClient", () => {
     const text = await client.getText("https://example.test/page");
     assert.equal(text, "<html>ok</html>");
     assert.equal(calls, 2);
-    assert.match(seenUa[0] ?? "", /campo-stats/);
+    assert.match(seenUa[0] ?? "", /campus/);
   });
 
   it("spaces sequential requests by minIntervalMs", async () => {

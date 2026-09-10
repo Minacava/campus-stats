@@ -51,7 +51,7 @@ describe("SqliteStore", () => {
 
   it("migrates JSON cache file into sqlite", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "campo-mig-"));
-    const jsonDir = path.join(dir, ".campo-stats");
+    const jsonDir = path.join(dir, ".campus");
     await mkdir(jsonDir);
     const jsonPath = path.join(jsonDir, "cache.json");
     const dbPath = path.join(dir, "campo.sqlite");

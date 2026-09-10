@@ -1,9 +1,9 @@
-import type { CampoCache, Team } from "../types.js";
+import type { CampusCache, Team } from "../types.js";
 import { matchTeamsAcrossSources } from "./match.js";
 import { applyIdentityRules } from "./rules.js";
 import { upsertIdentities } from "./store.js";
 
-function teamsForCompetition(cache: CampoCache, competitionName: string): Team[] {
+function teamsForCompetition(cache: CampusCache, competitionName: string): Team[] {
   const competition = cache.competitions.find(
     (c) => c.name.toLowerCase() === competitionName.toLowerCase(),
   );
@@ -34,9 +34,9 @@ export function partitionTeamsBySource(teams: Team[]): Map<string, Team[]> {
  * competition (typically statsbomb vs fbref).
  */
 export function proposeIdentitiesForCompetition(
-  cache: CampoCache,
+  cache: CampusCache,
   competitionName: string,
-): CampoCache {
+): CampusCache {
   const teams = teamsForCompetition(cache, competitionName);
   const bySource = [...partitionTeamsBySource(teams).entries()];
   if (bySource.length < 2) {

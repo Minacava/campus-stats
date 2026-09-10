@@ -14,7 +14,7 @@ Use **`node:sqlite`** (built-in Node.js module).
 ## Requirements
 
 - **Node.js ≥ 22** (aligned with the agent runtime; `package.json` engines updated).
-- No extra native binaries → better DX for `npx campo-stats`.
+- No extra native binaries → better DX for `npx campus`.
 
 ## Note
 

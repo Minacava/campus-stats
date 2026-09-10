@@ -1,6 +1,6 @@
 # Contributing adapters
 
-Adapters are the easiest way into `campo-stats`: implement `FootballSource`,
+Adapters are the easiest way into `campus`: implement `FootballSource`,
 normalize into the existing schema, open an MR.
 
 ## Checklist

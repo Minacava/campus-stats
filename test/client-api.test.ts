@@ -1,15 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { CampoClient } from "../src/client.js";
+import { CampusClient } from "../src/client.js";
 import { emptyCache } from "../src/cache.js";
 import {
   DEFAULT_FANTASY_RULES,
   scorePlayerMatchStats,
 } from "../src/scoring.js";
 import { INJURIES_AVAILABLE, listInjuries } from "../src/injuries.js";
-import type { CampoCache } from "../src/types.js";
+import type { CampusCache } from "../src/types.js";
 
-function sampleCache(): CampoCache {
+function sampleCache(): CampusCache {
   return {
     ...emptyCache(),
     competitions: [
@@ -85,9 +85,9 @@ function sampleCache(): CampoCache {
   };
 }
 
-describe("CampoClient library API", () => {
+describe("CampusClient library API", () => {
   it("queries matches, squad, and fantasy points for an app", () => {
-    const client = CampoClient.fromCache(sampleCache());
+    const client = CampusClient.fromCache(sampleCache());
     assert.equal(client.matches({ competition: "Liga F" }).length, 1);
     assert.equal(client.squad({ competition: "Liga F", team: "Barcelona" }).length, 1);
     const points = client.fantasyPoints({ competition: "Liga F" });
@@ -107,6 +107,6 @@ describe("CampoClient library API", () => {
   it("exposes injuries as unavailable empty list", () => {
     assert.equal(INJURIES_AVAILABLE, false);
     assert.equal(listInjuries(sampleCache()).length, 0);
-    assert.equal(CampoClient.fromCache(sampleCache()).injuries().records.length, 0);
+    assert.equal(CampusClient.fromCache(sampleCache()).injuries().records.length, 0);
   });
 });

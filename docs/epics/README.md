@@ -1,4 +1,4 @@
-# Campus / campo-stats — Epics
+# Campus / campus — Epics
 
 Open data layer for women's football: an npm/CLI package that normalizes
 statistics from scattered, inconsistent public sources into one
@@ -8,18 +8,18 @@ statistics from scattered, inconsistent public sources into one
 
 Women's football data coverage lags far behind the men's game. The data
 exists, but it is spread across inconsistent formats, and many tools built
-for the men's game do not cover it. `campo-stats` does not invent data: it
+for the men's game do not cover it. `campus` does not invent data: it
 fetches from providers that already publish it and unifies it so you can
 query Liga F, WSL, NWSL, etc. the same way.
 
-The npm package name is `campo-stats`.
+The npm package name is `campus`.
 
 ## Current status (v0)
 
 - Canonical schema: `Competition`, `Season`, `Team`, `Match`
 - One adapter: [StatsBomb Open Data](https://github.com/statsbomb/open-data)
 - CLI: `sync`, `competitions`, `seasons`, `teams`, `matches`
-- Local JSON cache (`.campo-stats/cache.json`), merged on every sync
+- Local JSON cache (`.campus/cache.json`), merged on every sync
 - Provenance per entity (`sources: [{ source, id }]`)
 
 ## Epic order

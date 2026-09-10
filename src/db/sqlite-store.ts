@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import type { CampoCache } from "../types.js";
+import type { CampusCache } from "../types.js";
 import type { CanonicalIdentity } from "../identity/types.js";
 import type {
   Competition,
@@ -118,7 +118,7 @@ export class SqliteStore {
     this.db.close();
   }
 
-  replaceAll(cache: CampoCache): void {
+  replaceAll(cache: CampusCache): void {
     this.db.exec("BEGIN");
     try {
       for (const table of [
@@ -142,8 +142,8 @@ export class SqliteStore {
     }
   }
 
-  /** Upsert entities from a CampoCache slice (merge semantics). */
-  upsertCache(cache: CampoCache): void {
+  /** Upsert entities from a CampusCache slice (merge semantics). */
+  upsertCache(cache: CampusCache): void {
     this.db.exec("BEGIN");
     try {
       this.insertCache(cache);
@@ -154,7 +154,7 @@ export class SqliteStore {
     }
   }
 
-  loadCache(): CampoCache {
+  loadCache(): CampusCache {
     const competitions = this.db
       .prepare("SELECT * FROM competitions")
       .all()
@@ -287,7 +287,7 @@ export class SqliteStore {
     };
   }
 
-  private insertCache(cache: CampoCache): void {
+  private insertCache(cache: CampusCache): void {
     const upsertCompetition = this.db.prepare(
       `INSERT INTO competitions (id, name, country, gender, sources_json)
        VALUES (?, ?, ?, ?, ?)

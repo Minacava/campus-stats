@@ -1,4 +1,4 @@
-import type { CampoCache, PlayerMatchStats } from "./types.js";
+import type { CampusCache, PlayerMatchStats } from "./types.js";
 
 /** Default fantasy scoring weights (outfield-oriented v1). */
 export interface FantasyScoringRules {
@@ -72,7 +72,7 @@ export function scorePlayerMatchStats(
 
 /** Score every player-match row in a cache (optionally filtered). */
 export function scoreFantasyPoints(
-  cache: CampoCache,
+  cache: CampusCache,
   options: {
     competitionId?: string;
     matchId?: string;
