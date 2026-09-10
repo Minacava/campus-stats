@@ -97,11 +97,11 @@ npx campo-stats sync --source fbref --competition "WSL"
 
 ### Update with new data
 
-There is no separate “update” command. Re-run `sync` when you want fresh data
-from the sources:
+`campo-stats` does **not** refresh in the background by itself. Data stays as
+of the last `sync` until you run it again (or schedule that command).
 
 ```bash
-# Same competition again — pulls latest and merges into the local cache
+# Manual refresh — pulls latest and merges into the local cache
 npx campo-stats sync --competition "Liga F"
 
 # Add another competition without wiping what you already have
@@ -111,6 +111,16 @@ npx campo-stats sync --competition "FA Women's Super League"
 Each sync **merges** into `.campo-stats/cache.json` (or your SQLite DB). It
 does not wipe previous leagues. Existing records are updated when the source
 sends newer values; new matches/teams are appended.
+
+**To update automatically**, schedule `sync` with cron, systemd timers, or a
+CI scheduled pipeline — for example once a day:
+
+```cron
+0 6 * * * cd /path/to/your/project && npx campo-stats sync --competition "Liga F"
+```
+
+There is no built-in daemon or push notification when sources publish new
+matches; automation is “run sync on a schedule.”
 
 ### 2. Query what you synced
 
