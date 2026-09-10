@@ -1,93 +1,108 @@
-# Campus
+# Campus (`campo-stats`)
 
+Open, normalized, queryable data on women's football — competitions,
+seasons, teams and matches, pulled from scattered public sources into
+one consistent schema.
 
+Women's football data is real; it's just scattered across inconsistent
+formats. `campo-stats` doesn't generate new data — it fetches from
+providers who already publish it, and normalizes everything into one
+schema so you can query Liga F, the WSL, the NWSL, etc. the same way.
 
-## Getting started
+> **Name:** `campus` was already taken on npm, so the package is
+> `campo-stats` ("campo" = pitch/field in Spanish).
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Plan de trabajo
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Epics y tasks (checklists): [`docs/epics/`](./docs/epics/README.md).  
+Inventario inicial del repo: [`docs/inventory-v0.md`](./docs/inventory-v0.md).
 
-## Add your files
+| Epic | Descripción |
+|------|-------------|
+| [00 — Fundación v0](./docs/epics/00-fundacion-v0.md) | Esquema, StatsBomb, CLI, caché JSON |
+| [01 — Adapter FBref](./docs/epics/01-adapter-fbref.md) | Segunda fuente pública |
+| [02 — Identidad](./docs/epics/02-resolucion-identidad.md) | Resolución cross-source |
+| [03 — Stats jugadora](./docs/epics/03-stats-jugadora.md) | Stats a nivel jugadora por partido |
+| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistencia más allá del JSON |
+| [05 — npm](./docs/epics/05-publicacion-npm.md) | Publicación del paquete |
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Quickstart (objetivo v0)
 
+```bash
+npm install
+npm run build
+
+node dist/cli.js sync --competition "Liga F"
+
+node dist/cli.js competitions
+node dist/cli.js seasons  --competition "Liga F"
+node dist/cli.js teams    --competition "Liga F"
+node dist/cli.js matches  --competition "Liga F" --season "2023/2024" --team "Barcelona"
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/marina34/campus.git
-git branch -M main
-git push -uf origin main
+
+Una vez publicado: `npx campo-stats sync ...` sin clonar el repo.
+
+## Why this shape
+
+**One canonical schema, adapters do the translating.** `src/types.ts`
+defines `Competition`, `Season`, `Team`, `Match`. Each provider under
+`src/sources/` implements `FootballSource` and returns data already
+mapped. The CLI and cache never see a provider's raw field names.
+
+**Every record keeps its provenance.** Entities carry
+`sources: [{ source, id }]`. Cross-source identity resolution will lean
+on that field.
+
+**Local cache is a plain JSON file.** `.campo-stats/cache.json`, merged
+(not replaced) on every `sync`. Deliberate v0 choice — see Epic 04 for
+SQLite.
+
+## Estado actual
+
+Epics 00–02 implementados: fundación, FBref, identidad cross-source de equipos.
+Siguiente: Epic 03 (stats a nivel jugadora).
+
+## Data source & terms
+
+v0 ships adapters for:
+
+- [StatsBomb Open Data](https://github.com/statsbomb/open-data) — Liga F, FA Women's
+  Super League, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, UEFA
+  Women's Euro (women's competitions only).
+- **FBref** (HTML schedule pages) — pilots documented in
+  [`docs/fbref-pilot.md`](./docs/fbref-pilot.md) (WSL + Liga F). Live fetches use a
+  rate-limited client; Cloudflare may block some networks — fixtures cover CI.
+
+**This code is MIT. The data is not ours to relicense.**
+
+- StatsBomb: free for research and genuine football-analytics use. If you publish
+  analysis built on it, credit StatsBomb (see their
+  [media pack](https://statsbomb.com/media-pack/)). Notice also in
+  [`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
+- FBref / Sports Reference: respect site terms, `robots.txt`, and rate limits.
+  Notice in [`src/sources/fbref.ts`](./src/sources/fbref.ts).
+
+Pass those requirements downstream — do not strip them out.
+
+### Sync examples
+
+```bash
+# StatsBomb (default)
+node dist/cli.js sync --competition "Liga F"
+
+# FBref pilot (WSL)
+node dist/cli.js sync --source fbref --competition "FA Women's Super League"
+# alias:
+node dist/cli.js sync --source fbref --competition "WSL"
 ```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://gitlab.com/marina34/campus/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
 ## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Adapters: follow the checklist in
+[`docs/contributing-adapters.md`](./docs/contributing-adapters.md)
+(`FootballSource`, normalization, provenance, terms, offline tests).
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Licencia
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Código: MIT (ver [`LICENSE`](./LICENSE)). Datos: sujetos a los términos de
+cada fuente — ver [Data source & terms](#data-source--terms).

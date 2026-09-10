@@ -1,0 +1,33 @@
+# Epic 01 — Adapter FBref (segunda fuente)
+
+## Objetivo
+
+Añadir FBref como segundo origen público, normalizado al mismo esquema que StatsBomb, sin tocar la lógica del CLI ni de la caché más allá de registrar la nueva fuente.
+
+## Contexto
+
+FBref ofrece cobertura más amplia de ligas, pero suele ser HTML scrapeado (no API JSON limpia). Requiere rate-limiting, parsing robusto y documentación clara de términos de uso. El adapter debe vivir en `src/sources/` e implementar `FootballSource`.
+
+## Criterios de hecho
+
+- Existe un adapter FBref que devuelve `Competition` / `Season` / `Team` / `Match` canónicos
+- `sync` puede apuntar a FBref (flag o detección por competición) sin romper StatsBomb
+- Rate-limit y errores de red/parsing están controlados y documentados
+- Al menos una competición femenina real se sincroniza de extremo a extremo
+
+## Tasks
+
+- [x] Elegir competiciones femeninas piloto en FBref (p. ej. WSL / Liga F) y documentar URLs/estructura HTML
+- [x] Diseñar cliente HTTP con rate-limit, retries y User-Agent responsable
+- [x] Implementar parser → entidades canónicas (sin filtrar nombres crudos de FBref al CLI)
+- [x] Registrar provenance `sources: [{ source: "fbref", id }]`
+- [x] Integrar el adapter en el registro de fuentes y en `sync` (sin romper el adapter StatsBomb)
+- [x] Tests con fixtures HTML/JSON offline (no depender de red en CI)
+- [x] Documentar en el adapter y en el README: límites, términos, cómo ejecutar sync FBref
+- [x] Verificar merge en caché: sync StatsBomb + sync FBref coexisten en el mismo `cache.json`
+
+## Criterios de hecho — estado
+
+Epic 01 tasks completadas. Live FBref puede fallar por Cloudflare; CI usa fixtures
+(`test/fbref-source.test.ts` cubre sync + merge con StatsBomb).
+
