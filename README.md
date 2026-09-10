@@ -85,42 +85,50 @@ All commands write/read a local store in the current directory:
 - Default: `.campo-stats/cache.json`
 - Optional: SQLite with `--sqlite` or `--db <path>`
 
-### 1. Sync a competition
+### 1. Sync competitions
 
 ```bash
-# StatsBomb (default)
+# One command: all StatsBomb women's comps (clubs + national teams)
+npx campo-stats sync --fantasy
+
+# Or a single competition
 npx campo-stats sync --competition "Liga F"
 
 # FBref pilot (schedule HTML; may be blocked by Cloudflare on some networks)
 npx campo-stats sync --source fbref --competition "WSL"
+
+# List what StatsBomb currently publishes for women
+npx campo-stats available
 ```
 
-### Update with new data
+### Update with new data (cron)
 
-`campo-stats` does **not** refresh in the background by itself. Data stays as
-of the last `sync` until you run it again (or schedule that command).
+There is no background daemon inside the package. Refresh happens on a
+**schedule**:
+
+1. **GitLab CI cron (recommended)** — Pipeline schedule runs
+   `refresh_fantasy_data` daily, uploads `campo-stats-data/latest/cache.json`.
+   Setup: [`docs/cron.md`](./docs/cron.md).
+2. **Consumers pull** the published snapshot:
 
 ```bash
-# Manual refresh — pulls latest and merges into the local cache
-npx campo-stats sync --competition "Liga F"
-
-# Add another competition without wiping what you already have
-npx campo-stats sync --competition "FA Women's Super League"
+npx campo-stats pull
 ```
 
-Each sync **merges** into `.campo-stats/cache.json` (or your SQLite DB). It
-does not wipe previous leagues. Existing records are updated when the source
-sends newer values; new matches/teams are appended.
+3. **Or re-sync locally** (full catalogue or only what you already cached):
 
-**To update automatically**, schedule `sync` with cron, systemd timers, or a
-CI scheduled pipeline — for example once a day:
+```bash
+npx campo-stats sync --fantasy
+npx campo-stats update
+```
+
+4. **Local crontab** (optional):
 
 ```cron
-0 6 * * * cd /path/to/your/project && npx campo-stats sync --competition "Liga F"
+0 6 * * * cd /path/to/project && npx campo-stats sync --fantasy
 ```
 
-There is no built-in daemon or push notification when sources publish new
-matches; automation is “run sync on a schedule.”
+Each sync **merges** into `.campo-stats/cache.json` (or your SQLite DB).
 
 ### 2. Query what you synced
 
