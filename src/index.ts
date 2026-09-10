@@ -4,6 +4,8 @@ export type {
   Season,
   Team,
   Match,
+  Player,
+  PlayerMatchStats,
   CampoCache,
 } from "./types.js";
 export type {

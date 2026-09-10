@@ -13,6 +13,8 @@ export function emptyCache(): CampoCache {
     teams: [],
     matches: [],
     identities: [],
+    players: [],
+    playerMatchStats: [],
   };
 }
 
@@ -30,6 +32,8 @@ export async function loadCache(filePath: string = cachePath()): Promise<CampoCa
       teams: parsed.teams ?? [],
       matches: parsed.matches ?? [],
       identities: parsed.identities ?? [],
+      players: parsed.players ?? [],
+      playerMatchStats: parsed.playerMatchStats ?? [],
     };
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
@@ -61,5 +65,10 @@ export function mergeSyncResult(cache: CampoCache, result: SyncResult): CampoCac
     teams: mergeById<Team>(cache.teams, result.teams),
     matches: mergeById<Match>(cache.matches, result.matches),
     identities: cache.identities,
+    players: mergeById(cache.players, result.players ?? []),
+    playerMatchStats: mergeById(
+      cache.playerMatchStats,
+      result.playerMatchStats ?? [],
+    ),
   };
 }
