@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-- Initial public package layout for `campo-stats`
+- Initial package layout for `campo-stats` (distributed via GitLab Package Registry, not npmjs)
 - StatsBomb + FBref (schedule) adapters
 - JSON cache and optional SQLite persistence
 - Player match stats (StatsBomb, capped)
