@@ -38,6 +38,11 @@ node dist/cli.js competitions
 node dist/cli.js seasons  --competition "Liga F"
 node dist/cli.js teams    --competition "Liga F"
 node dist/cli.js matches  --competition "Liga F" --season "2023/2024" --team "Barcelona"
+
+# optional: enrich a few matches with v1 player stats (StatsBomb)
+node dist/cli.js sync --competition "Liga F" --with-players --player-stats-limit 3
+node dist/cli.js players --name "Walsh"
+node dist/cli.js player-stats --competition "Liga F" --player "Walsh"
 ```
 
 Una vez publicado: `npx campo-stats sync ...` sin clonar el repo.
@@ -59,8 +64,8 @@ SQLite.
 
 ## Estado actual
 
-Epics 00–02 implementados: fundación, FBref, identidad cross-source de equipos.
-Siguiente: Epic 03 (stats a nivel jugadora).
+Epics 00–03 implementados: fundación, FBref, identidad, stats de jugadora
+(StatsBomb, `--with-players`). Siguiente: Epic 04 (SQLite).
 
 ## Data source & terms
 
