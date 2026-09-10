@@ -4,9 +4,15 @@
  */
 
 import { emptyCache, mergeSyncResult } from "./cache.js";
-import { StatsBombSource, type StatsBombSourceOptions } from "./sources/statsbomb.js";
+import {
+  StatsBombSource,
+  type StatsBombSourceOptions,
+  type WomenCompetitionInfo,
+} from "./sources/statsbomb.js";
 import type { SyncResult } from "./sources/types.js";
 import type { CampoCache, Competition } from "./types.js";
+
+export type { WomenCompetitionInfo };
 
 /** Default cap when enriching player stats in fantasy sync. */
 export const FANTASY_PLAYER_STATS_LIMIT = 25;
@@ -20,14 +26,6 @@ export interface FantasySyncOptions extends StatsBombSourceOptions {
   latestSeasonPlayersOnly?: boolean;
   /** Optional progress logger (CLI uses stderr). */
   onProgress?: (message: string) => void;
-}
-
-export interface WomenCompetitionInfo {
-  id: number;
-  name: string;
-  country: string;
-  international: boolean;
-  seasons: Array<{ id: number; name: string }>;
 }
 
 /**

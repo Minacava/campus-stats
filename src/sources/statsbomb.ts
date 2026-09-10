@@ -11,7 +11,15 @@
  */
 
 import { entityId } from "../ids.js";
-import type { Competition, Match, Player, PlayerMatchStats, Season, Team } from "../types.js";
+import type {
+  Competition,
+  Match,
+  Player,
+  PlayerMatchStats,
+  Season,
+  Team,
+  TeamKind,
+} from "../types.js";
 import { aggregateStatsBombPlayerMatch } from "./statsbomb-player-stats.js";
 import type { FootballSource, SyncResult } from "./types.js";
 
@@ -19,12 +27,21 @@ const SOURCE = "statsbomb";
 const BASE =
   "https://raw.githubusercontent.com/statsbomb/open-data/master/data";
 
+export interface WomenCompetitionInfo {
+  id: number;
+  name: string;
+  country: string;
+  international: boolean;
+  seasons: Array<{ id: number; name: string }>;
+}
+
 interface SbCompetition {
   competition_id: number;
   season_id: number;
   country_name: string;
   competition_name: string;
   competition_gender: string;
+  competition_international?: boolean;
   season_name: string;
 }
 
@@ -84,6 +101,30 @@ export class StatsBombSource implements FootballSource {
     this.playerStatsLimit = options.playerStatsLimit ?? 5;
   }
 
+  /** Catalogue of women's competitions (clubs + national-team tournaments). */
+  async listWomenCompetitions(): Promise<WomenCompetitionInfo[]> {
+    const all = await this.fetchJson<SbCompetition[]>(
+      `${this.baseUrl}/competitions.json`,
+    );
+    const byId = new Map<number, WomenCompetitionInfo>();
+    for (const row of all) {
+      if (row.competition_gender !== "female") continue;
+      const existing = byId.get(row.competition_id);
+      if (!existing) {
+        byId.set(row.competition_id, {
+          id: row.competition_id,
+          name: row.competition_name,
+          country: row.country_name,
+          international: Boolean(row.competition_international),
+          seasons: [{ id: row.season_id, name: row.season_name }],
+        });
+      } else {
+        existing.seasons.push({ id: row.season_id, name: row.season_name });
+      }
+    }
+    return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   async syncCompetition(competitionName: string): Promise<SyncResult> {
     const all = await this.fetchJson<SbCompetition[]>(
       `${this.baseUrl}/competitions.json`,
@@ -115,11 +156,14 @@ export class StatsBombSource implements FootballSource {
 
     for (const row of rows) {
       const competitionId = entityId(SOURCE, "comp", row.competition_id);
+      const international = Boolean(row.competition_international);
+      const teamKind: TeamKind = international ? "national" : "club";
       competitions.set(competitionId, {
         id: competitionId,
         name: row.competition_name,
         country: row.country_name,
         gender: "female",
+        international,
         sources: [{ source: SOURCE, id: String(row.competition_id) }],
       });
 
@@ -153,12 +197,14 @@ export class StatsBombSource implements FootballSource {
           id: homeId,
           name: m.home_team.home_team_name,
           country: m.home_team.country?.name,
+          kind: teamKind,
           sources: [{ source: SOURCE, id: String(m.home_team.home_team_id) }],
         });
         teams.set(awayId, {
           id: awayId,
           name: m.away_team.away_team_name,
           country: m.away_team.country?.name,
+          kind: teamKind,
           sources: [{ source: SOURCE, id: String(m.away_team.away_team_id) }],
         });
 

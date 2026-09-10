@@ -1,5 +1,9 @@
 #!/usr/bin/env node
-import { cachePath } from "./cache.js";
+import { cachePath, emptyCache, mergeSyncResult } from "./cache.js";
+import {
+  dataBundleUrl,
+  GITLAB_PROJECT_ID,
+} from "./data-bundle.js";
 import {
   readStore,
   resolveDbPath,
@@ -9,6 +13,12 @@ import {
   writeSyncToStore,
   type StoreMode,
 } from "./db/store-api.js";
+import {
+  FANTASY_PLAYER_STATS_LIMIT,
+  listWomenCompetitions,
+  syncFantasyBundle,
+  updateCachedCompetitions,
+} from "./fantasy.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
@@ -23,7 +33,11 @@ function usage(): never {
   console.error(`campo-stats — women's football data CLI
 
 Usage:
+  campo-stats sync --fantasy|--all [--with-players] [--player-stats-limit <n>]
   campo-stats sync --competition <name> [--source statsbomb|fbref] [--with-players] [--player-stats-limit <n>]
+  campo-stats update [--with-players] [--player-stats-limit <n>]
+  campo-stats pull [--url <cache.json url>]
+  campo-stats available
   campo-stats competitions
   campo-stats seasons --competition <name>
   campo-stats teams --competition <name>
@@ -37,10 +51,12 @@ Usage:
   campo-stats migrate [--db <path>]
 
 Options:
+  --fantasy / --all          Sync all StatsBomb women's comps (clubs + national teams)
   --competition <name>       Competition display name (e.g. "Liga F")
   --source <id>              Data source for sync (default: statsbomb)
   --with-players             StatsBomb only: also sync v1 player match stats
-  --player-stats-limit <n>   Max matches to enrich (default 5)
+  --player-stats-limit <n>   Max matches to enrich (default 5; fantasy default 25)
+  --url <url>                Override data-bundle URL for pull
   --season <name>            Season label (e.g. "2023/2024")
   --team <name>              Team name substring (case-insensitive)
   --player <name>            Player name substring
@@ -52,6 +68,8 @@ Options:
   --db <path>                SQLite database path (implies --sqlite)
   --json                     Force JSON cache (default)
   --help                     Show this help
+
+Periodic refresh: see docs/cron.md (GitLab CI schedule + campo-stats pull).
 `);
   process.exit(1);
 }
@@ -91,12 +109,34 @@ function requireCompetition(cache: CampoCache, name: string) {
 }
 
 async function cmdSync(args: string[]): Promise<void> {
+  const fantasy = hasFlag(args, "--fantasy") || hasFlag(args, "--all");
   const competition = getFlag(args, "--competition");
-  if (!competition) usage();
-  const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
   const withPlayers = hasFlag(args, "--with-players");
   const limitRaw = getFlag(args, "--player-stats-limit");
-  const playerStatsLimit = limitRaw ? Number(limitRaw) : 5;
+  const playerStatsLimit = limitRaw
+    ? Number(limitRaw)
+    : fantasy
+      ? FANTASY_PLAYER_STATS_LIMIT
+      : 5;
+
+  if (fantasy) {
+    if (competition) {
+      throw new Error("Use either --fantasy/--all or --competition, not both.");
+    }
+    console.error("Syncing fantasy bundle (all StatsBomb women's competitions)…");
+    const result = await syncFantasyBundle({
+      includePlayerStats: withPlayers,
+      playerStatsLimit,
+      latestSeasonPlayersOnly: true,
+      onProgress: (msg) => console.error(msg),
+    });
+    const cache = await writeSyncToStore(storeMode, dbPath, result);
+    printSyncSummary("statsbomb", result, cache);
+    return;
+  }
+
+  if (!competition) usage();
+  const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
 
   let source: FootballSource;
   if (sourceId === "statsbomb") {
@@ -118,13 +158,27 @@ async function cmdSync(args: string[]): Promise<void> {
   console.error(`Syncing "${competition}" from ${source.id}…`);
   const result = await source.syncCompetition(competition);
   const cache = await writeSyncToStore(storeMode, dbPath, result);
+  printSyncSummary(source.id, result, cache);
+}
 
+function printSyncSummary(
+  sourceId: string,
+  result: {
+    competitions: Array<{ name: string }>;
+    seasons: unknown[];
+    teams: unknown[];
+    matches: unknown[];
+    players?: unknown[];
+    playerMatchStats?: unknown[];
+  },
+  cache: CampoCache,
+): void {
   console.log(
     JSON.stringify(
       {
-        source: source.id,
+        source: sourceId,
         cache: storeMode === "json" ? cachePath() : dbPath,
-        competition: result.competitions[0]?.name,
+        competitions: result.competitions.map((c) => c.name),
         seasons: result.seasons.length,
         teams: result.teams.length,
         matches: result.matches.length,
@@ -145,6 +199,100 @@ async function cmdSync(args: string[]): Promise<void> {
   );
 }
 
+async function cmdUpdate(args: string[]): Promise<void> {
+  const withPlayers = hasFlag(args, "--with-players");
+  const limitRaw = getFlag(args, "--player-stats-limit");
+  const playerStatsLimit = limitRaw
+    ? Number(limitRaw)
+    : FANTASY_PLAYER_STATS_LIMIT;
+  const before = await readStore(storeMode, dbPath);
+  console.error(
+    before.competitions.length === 0
+      ? "Cache empty — running full fantasy sync…"
+      : `Updating ${before.competitions.length} cached competition(s)…`,
+  );
+  const result = await updateCachedCompetitions(before, {
+    includePlayerStats: withPlayers,
+    playerStatsLimit,
+    latestSeasonPlayersOnly: true,
+    onProgress: (msg) => console.error(msg),
+  });
+  const cache = await writeSyncToStore(storeMode, dbPath, result);
+  printSyncSummary("statsbomb", result, cache);
+}
+
+async function cmdPull(args: string[]): Promise<void> {
+  const url = getFlag(args, "--url") ?? dataBundleUrl(GITLAB_PROJECT_ID);
+  console.error(`Pulling data bundle from ${url}…`);
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Failed to pull data bundle (${res.status}). ` +
+        `Ensure the GitLab CI cron has published campo-stats-data/latest (see docs/cron.md).`,
+    );
+  }
+  const remote = (await res.json()) as Partial<CampoCache>;
+  const incoming = {
+    ...emptyCache(),
+    competitions: remote.competitions ?? [],
+    seasons: remote.seasons ?? [],
+    teams: remote.teams ?? [],
+    matches: remote.matches ?? [],
+    identities: remote.identities ?? [],
+    players: remote.players ?? [],
+    playerMatchStats: remote.playerMatchStats ?? [],
+  };
+  const local = await readStore(storeMode, dbPath);
+  const merged = mergeSyncResult(local, {
+    competitions: incoming.competitions,
+    seasons: incoming.seasons,
+    teams: incoming.teams,
+    matches: incoming.matches,
+    players: incoming.players,
+    playerMatchStats: incoming.playerMatchStats,
+  });
+  // Preserve local identities; prefer remote entity payloads via mergeById.
+  merged.identities = local.identities.length
+    ? local.identities
+    : incoming.identities;
+  await writeCacheToStore(storeMode, dbPath, merged);
+  console.log(
+    JSON.stringify(
+      {
+        url,
+        cache: storeMode === "json" ? cachePath() : dbPath,
+        totals: {
+          competitions: merged.competitions.length,
+          seasons: merged.seasons.length,
+          teams: merged.teams.length,
+          matches: merged.matches.length,
+          players: merged.players.length,
+          playerMatchStats: merged.playerMatchStats.length,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdAvailable(): Promise<void> {
+  const list = await listWomenCompetitions();
+  console.log(
+    JSON.stringify(
+      list.map((c) => ({
+        id: c.id,
+        name: c.name,
+        country: c.country,
+        international: c.international,
+        seasons: c.seasons.map((s) => s.name),
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
 async function cmdCompetitions(): Promise<void> {
   const cache = await readStore(storeMode, dbPath);
   console.log(
@@ -153,6 +301,7 @@ async function cmdCompetitions(): Promise<void> {
         id: c.id,
         name: c.name,
         country: c.country,
+        international: c.international ?? false,
       })),
       null,
       2,
@@ -197,7 +346,12 @@ async function cmdTeams(args: string[]): Promise<void> {
     .sort((a, b) => a.name.localeCompare(b.name));
   console.log(
     JSON.stringify(
-      teams.map((t) => ({ id: t.id, name: t.name, country: t.country })),
+      teams.map((t) => ({
+        id: t.id,
+        name: t.name,
+        country: t.country,
+        kind: t.kind,
+      })),
       null,
       2,
     ),
@@ -406,6 +560,15 @@ async function main(): Promise<void> {
   switch (command) {
     case "sync":
       await cmdSync(args);
+      break;
+    case "update":
+      await cmdUpdate(args);
+      break;
+    case "pull":
+      await cmdPull(args);
+      break;
+    case "available":
+      await cmdAvailable();
       break;
     case "competitions":
       await cmdCompetitions();
