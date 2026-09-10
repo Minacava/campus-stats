@@ -22,6 +22,6 @@ FBref ofrece cobertura más amplia de ligas, pero suele ser HTML scrapeado (no A
 - [x] Implementar parser → entidades canónicas (sin filtrar nombres crudos de FBref al CLI)
 - [x] Registrar provenance `sources: [{ source: "fbref", id }]`
 - [x] Integrar el adapter en el registro de fuentes y en `sync` (sin romper el adapter StatsBomb)
-- [ ] Tests con fixtures HTML/JSON offline (no depender de red en CI)
+- [x] Tests con fixtures HTML/JSON offline (no depender de red en CI)
 - [ ] Documentar en el adapter y en el README: límites, términos, cómo ejecutar sync FBref
 - [ ] Verificar merge en caché: sync StatsBomb + sync FBref coexisten en el mismo `cache.json`
