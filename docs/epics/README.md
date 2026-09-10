@@ -31,7 +31,7 @@ The npm package name is `campo-stats`.
 | 02 | [Identity resolution](./02-resolucion-identidad.md) | 01 |
 | 03 | [Player-level stats](./03-stats-jugadora.md) | 00 (ideally 02) |
 | 04 | [SQLite persistence](./04-persistencia-sqlite.md) | 00 (needed before/during 03 at scale) |
-| 05 | [npm publication](./05-publicacion-npm.md) | Stable API (after 01–04 per release scope) |
+| 05 | [Package (GitLab)](./05-publicacion-npm.md) | Stable API (after 01–04 per release scope) |
 
 Each epic lists **Tasks** as checkboxes. Mark them when done; do not invent
 scope outside the list without updating the epic.
