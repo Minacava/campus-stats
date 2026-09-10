@@ -19,6 +19,8 @@ import {
   syncFantasyBundle,
   updateCachedCompetitions,
 } from "./fantasy.js";
+import { CampoClient } from "./client.js";
+import { INJURIES_STATUS_MESSAGE } from "./injuries.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
@@ -44,6 +46,10 @@ Usage:
   campo-stats matches --competition <name> [--season <name>] [--team <name>]
   campo-stats players [--team <name>] [--name <name>]
   campo-stats player-stats [--competition <name>] [--match <id>] [--player <name>] [--team <name>]
+  campo-stats lineups [--match <id>] [--team <name>]
+  campo-stats squad --competition <name> --team <name> [--season <name>]
+  campo-stats fantasy-points [--competition <name>] [--player <name>] [--match <id>]
+  campo-stats injuries
   campo-stats identities [--status resolved|pending|rejected]
   campo-stats identities propose --competition <name>
   campo-stats identities confirm --id <identityId>
@@ -241,6 +247,8 @@ async function cmdPull(args: string[]): Promise<void> {
     identities: remote.identities ?? [],
     players: remote.players ?? [],
     playerMatchStats: remote.playerMatchStats ?? [],
+    lineups: remote.lineups ?? [],
+    injuries: remote.injuries ?? [],
   };
   const local = await readStore(storeMode, dbPath);
   const merged = mergeSyncResult(local, {
@@ -250,6 +258,8 @@ async function cmdPull(args: string[]): Promise<void> {
     matches: incoming.matches,
     players: incoming.players,
     playerMatchStats: incoming.playerMatchStats,
+    lineups: incoming.lineups,
+    injuries: incoming.injuries,
   });
   // Preserve local identities; prefer remote entity payloads via mergeById.
   merged.identities = local.identities.length
@@ -268,6 +278,7 @@ async function cmdPull(args: string[]): Promise<void> {
           matches: merged.matches.length,
           players: merged.players.length,
           playerMatchStats: merged.playerMatchStats.length,
+          lineups: merged.lineups.length,
         },
       },
       null,
@@ -549,6 +560,76 @@ async function cmdIdentities(args: string[]): Promise<void> {
   console.log(JSON.stringify(identities, null, 2));
 }
 
+async function cmdLineups(args: string[]): Promise<void> {
+  const matchId = getFlag(args, "--match");
+  const team = getFlag(args, "--team");
+  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const playerById = new Map(client.data.players.map((p) => [p.id, p]));
+  const teamById = new Map(client.data.teams.map((t) => [t.id, t]));
+  console.log(
+    JSON.stringify(
+      client.lineups({ matchId, team }).map((l) => ({
+        matchId: l.matchId,
+        team: teamById.get(l.teamId)?.name,
+        player: playerById.get(l.playerId)?.name,
+        started: l.started,
+        jerseyNumber: l.jerseyNumber,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdSquad(args: string[]): Promise<void> {
+  const competition = getFlag(args, "--competition");
+  const team = getFlag(args, "--team");
+  if (!competition || !team) usage();
+  const season = getFlag(args, "--season");
+  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  console.log(
+    JSON.stringify(client.squad({ competition, team, season }), null, 2),
+  );
+}
+
+async function cmdFantasyPoints(args: string[]): Promise<void> {
+  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const rows = client.fantasyPoints({
+    competition: getFlag(args, "--competition"),
+    matchId: getFlag(args, "--match"),
+    player: getFlag(args, "--player"),
+    team: getFlag(args, "--team"),
+  });
+  const playerById = new Map(client.data.players.map((p) => [p.id, p]));
+  console.log(
+    JSON.stringify(
+      rows.map((r) => ({
+        matchId: r.matchId,
+        player: playerById.get(r.playerId)?.name,
+        points: r.points,
+        breakdown: r.breakdown,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdInjuries(): Promise<void> {
+  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  console.log(
+    JSON.stringify(
+      {
+        available: client.injuries().available,
+        message: INJURIES_STATUS_MESSAGE,
+        records: client.injuries().records,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   if (!command || command === "--help" || args.includes("--help")) usage();
@@ -587,6 +668,18 @@ async function main(): Promise<void> {
       break;
     case "player-stats":
       await cmdPlayerStats(args);
+      break;
+    case "lineups":
+      await cmdLineups(args);
+      break;
+    case "squad":
+      await cmdSquad(args);
+      break;
+    case "fantasy-points":
+      await cmdFantasyPoints(args);
+      break;
+    case "injuries":
+      await cmdInjuries();
       break;
     case "identities":
       await cmdIdentities(args);

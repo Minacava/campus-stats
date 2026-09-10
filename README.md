@@ -1,188 +1,124 @@
 # Campus (`campo-stats`)
 
-**Open, normalized, queryable data for women's football.**
+**Open, normalized, queryable data for women's football — installable in your app.**
 
-`campo-stats` is a small Node.js CLI (and library) that pulls women's football
-stats from public sources that already publish them, normalizes everything into
-one schema, and lets you query competitions, seasons, teams, matches, and
-player stats the same way — whether the data came from StatsBomb, FBref, or a
-future adapter.
+`campo-stats` is an npm package (library + CLI) that pulls women's football stats
+from public sources, normalizes them into one schema, and gives your web/API/app
+access to competitions, seasons, clubs, national teams, matches, lineups,
+player stats, and basic fantasy points.
 
-Requires **Node.js ≥ 22**.
-
----
-
-## What problem it solves
-
-Women's football data exists, but it is scattered across inconsistent formats.
-Tools built for the men's game often skip it. If you want to answer simple
-questions like “how many matches did Barcelona play in Liga F 2023/24?” or
-“who scored in this WSL match?” without hand-merging CSVs, `campo-stats` is
-for you.
-
-## Use cases
-
-1. **Research / analytics notebooks**  
-   Sync Liga F or the WSL once, then query matches and player stats from a
-   local JSON or SQLite cache inside a Python/R/JS notebook workflow.
-
-2. **Journalism & reporting**  
-   Pull a season of fixtures and scores for a women's league, filter by team,
-   and export facts for a story — with provenance pointing back to StatsBomb
-   or FBref.
-
-3. **Product prototypes**  
-   Build a dashboard or API that treats Liga F, WSL, and NWSL through one
-   schema instead of writing a custom scraper per league.
-
-4. **Teaching & workshops**  
-   Demonstrate open-data football analytics with real women's competitions
-   (`sync` → local cache → query), without setting up a database server.
-
-5. **Cross-source experiments**  
-   Sync StatsBomb + FBref, then use `identities propose` to explore how the
-   same clubs are named differently across providers.
+Requires **Node.js ≥ 22** (library and CLI). For browser UIs, load data in a
+Node/serverless backend (or ship a pre-pulled JSON cache) and send JSON to the
+client.
 
 ---
 
-## Install from GitLab
+## Install in a web/app project
 
-Packages live in this project's registry (not npmjs):
+Packages are published from this GitLab project (not npmjs.com):
 
 ```bash
 npm install campo-stats \
   --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
-Or download a release tarball from the Generic Package Registry (after a
-tagged release), for example:
+Or pin a tarball after a tagged release:
 
 ```bash
 npm install \
-  https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.1.0/campo-stats-0.1.0.tgz
+  https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.2.0/campo-stats-0.2.0.tgz
 ```
 
-Browse packages: https://gitlab.com/marina34/campus/-/packages  
+> Until the first `vX.Y.Z` tag is published, clone this repo and
+> `npm install /path/to/campus` / `npm pack`.
 
-Full install options: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
+Browse packages: https://gitlab.com/marina34/campus/-/packages
 
-### Develop from a clone
+---
+
+## Use as a library (recommended for apps)
+
+```ts
+import { CampoClient } from "campo-stats";
+
+// Option A — pull the cron-refreshed data bundle (no local sync needed)
+const client = await CampoClient.fromBundle();
+
+// Option B — open/create a local cache and sync everything once
+// const client = await CampoClient.open();
+// await client.syncFantasy({ includePlayerStats: true });
+
+const clubs = client.teams({ competition: "Liga F", kind: "club" });
+const nations = client.teams({ competition: "Women's World Cup", kind: "national" });
+const matches = client.matches({ competition: "Liga F", team: "Barcelona" });
+const squad = client.squad({ competition: "Liga F", team: "Barcelona" });
+const points = client.fantasyPoints({ competition: "Liga F", player: "Walsh" });
+
+// Serialize to your frontend
+return Response.json({ clubs, nations, matches, squad, points });
+```
+
+### What you get from the package
+
+| API | Purpose |
+|-----|---------|
+| `CampoClient` | Main entry for apps: sync / pull / query |
+| `syncFantasyBundle` / `updateCachedCompetitions` | Low-level sync helpers |
+| `scoreFantasyPoints` | Default fantasy scoring rules |
+| `listInjuries` | Stable stub (empty until a source exists) |
+| Types | `Competition`, `Team`, `Match`, `Player`, `LineupEntry`, … |
+| CLI bin `campo-stats` | Same data from the terminal |
+
+---
+
+## Keep data fresh (cron)
+
+1. GitLab **Pipeline schedule** on `main` (e.g. `0 6 * * *`) runs
+   `refresh_fantasy_data` and publishes `campo-stats-data/latest/cache.json`.
+2. Apps call `CampoClient.fromBundle()` or `npx campo-stats pull`.
+
+Details: [`docs/cron.md`](./docs/cron.md).
+
+---
+
+## CLI quick start
+
+```bash
+npx campo-stats sync --fantasy                 # all women's comps (clubs + selecciones)
+npx campo-stats sync --fantasy --with-players  # + lineups + player stats (capped)
+npx campo-stats pull                           # download cron bundle
+npx campo-stats competitions
+npx campo-stats matches --competition "Liga F" --team "Barcelona"
+npx campo-stats squad --competition "Liga F" --team "Barcelona"
+npx campo-stats fantasy-points --competition "Liga F"
+npx campo-stats injuries                       # empty + documented deferral
+```
+
+Store: `.campo-stats/cache.json` (or `--sqlite`).
+
+---
+
+## Supported data (open sources)
+
+| Source | Coverage | Notes |
+|--------|----------|-------|
+| **StatsBomb Open Data** | Liga F, WSL, NWSL, Serie A Women, Frauen Bundesliga, Women's World Cup, UEFA Women's Euro | Clubs + national teams; optional player stats / lineups |
+| **FBref** | WSL + Liga F schedules (pilot) | Live HTML may hit Cloudflare |
+
+Injuries are **not** in these open feeds yet — the API is ready, the list is empty.
+
+---
+
+## Develop from a clone
 
 ```bash
 git clone https://gitlab.com/marina34/campus.git
 cd campus
 npm install
 npm run build
+npm test
 node dist/cli.js --help
 ```
-
----
-
-## How to use (CLI)
-
-All commands write/read a local store in the current directory:
-
-- Default: `.campo-stats/cache.json`
-- Optional: SQLite with `--sqlite` or `--db <path>`
-
-### 1. Sync competitions
-
-```bash
-# One command: all StatsBomb women's comps (clubs + national teams)
-npx campo-stats sync --fantasy
-
-# Or a single competition
-npx campo-stats sync --competition "Liga F"
-
-# FBref pilot (schedule HTML; may be blocked by Cloudflare on some networks)
-npx campo-stats sync --source fbref --competition "WSL"
-
-# List what StatsBomb currently publishes for women
-npx campo-stats available
-```
-
-### Update with new data (cron)
-
-There is no background daemon inside the package. Refresh happens on a
-**schedule**:
-
-1. **GitLab CI cron (recommended)** — Pipeline schedule runs
-   `refresh_fantasy_data` daily, uploads `campo-stats-data/latest/cache.json`.
-   Setup: [`docs/cron.md`](./docs/cron.md).
-2. **Consumers pull** the published snapshot:
-
-```bash
-npx campo-stats pull
-```
-
-3. **Or re-sync locally** (full catalogue or only what you already cached):
-
-```bash
-npx campo-stats sync --fantasy
-npx campo-stats update
-```
-
-4. **Local crontab** (optional):
-
-```cron
-0 6 * * * cd /path/to/project && npx campo-stats sync --fantasy
-```
-
-Each sync **merges** into `.campo-stats/cache.json` (or your SQLite DB).
-
-### 2. Query what you synced
-
-```bash
-npx campo-stats competitions
-npx campo-stats seasons --competition "Liga F"
-npx campo-stats teams --competition "Liga F"
-npx campo-stats matches --competition "Liga F" --season "2023/2024" --team "Barcelona"
-```
-
-### 3. Optional player match stats (StatsBomb)
-
-Event files are large, so enrichment is capped (default 5 matches):
-
-```bash
-npx campo-stats sync --competition "Liga F" --with-players --player-stats-limit 3
-npx campo-stats players --name "Walsh"
-npx campo-stats player-stats --competition "Liga F" --player "Walsh"
-```
-
-### 4. Optional cross-source team identities
-
-After you have teams from two sources in the cache:
-
-```bash
-npx campo-stats identities propose --competition "Liga F"
-npx campo-stats identities --status pending
-npx campo-stats identities confirm --id identity:team:barcelona
-```
-
-### 5. Optional SQLite store
-
-```bash
-npx campo-stats migrate --db .campo-stats/campo-stats.sqlite
-npx campo-stats sync --competition "Liga F" --sqlite
-npx campo-stats competitions --sqlite
-```
-
----
-
-## Supported data (v0.1)
-
-| Source | What you get | Notes |
-|--------|----------------|-------|
-| **StatsBomb Open Data** | Competitions, seasons, teams, matches; optional player stats | Liga F, FA WSL, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, UEFA Women's Euro |
-| **FBref** | Schedule → competitions / seasons / teams / matches | Pilots: WSL, Liga F. Live HTML may hit Cloudflare; CI uses fixtures |
-
----
-
-## Why this shape
-
-- **One canonical schema** (`Competition`, `Season`, `Team`, `Match`, …). Adapters translate; the CLI never sees provider field names.
-- **Provenance on every record** (`sources: [{ source, id }]`) so cross-source identity is possible later.
-- **Local-first cache** (JSON by default, SQLite optional) — no hosted database required.
 
 ---
 
@@ -197,7 +133,7 @@ npx campo-stats competitions --sqlite
 | [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
 | [05 — Package](./docs/epics/05-publicacion-npm.md) | GitLab package distribution |
 
-More: [`docs/epics/`](./docs/epics/README.md) · [`docs/versioning.md`](./docs/versioning.md) · [`CHANGELOG.md`](./CHANGELOG.md)
+More: [`docs/cron.md`](./docs/cron.md) · [`docs/injuries.md`](./docs/injuries.md) · [`CHANGELOG.md`](./CHANGELOG.md)
 
 ---
 
@@ -214,5 +150,4 @@ Pass those requirements downstream.
 
 ## License
 
-Code: MIT (see [`LICENSE`](./LICENSE)). Data: subject to each source's terms —
-see [Data source & terms](#data-source--terms).
+Code: MIT (see [`LICENSE`](./LICENSE)). Data: subject to each source's terms.

@@ -88,6 +88,7 @@ export async function syncFantasyBundle(
     const players = await enrichSource.loadPlayerStatsForMatches(targets);
     merged.players = players.players;
     merged.playerMatchStats = players.playerMatchStats;
+    merged.lineups = players.lineups;
   }
 
   return merged;
@@ -141,6 +142,7 @@ export async function updateCachedCompetitions(
     const players = await enrichSource.loadPlayerStatsForMatches(targets);
     merged.players = players.players;
     merged.playerMatchStats = players.playerMatchStats;
+    merged.lineups = players.lineups;
   }
 
   return merged;
@@ -158,6 +160,8 @@ function emptySyncResult(): SyncResult {
     matches: [],
     players: [],
     playerMatchStats: [],
+    lineups: [],
+    injuries: [],
   };
 }
 
@@ -167,11 +171,15 @@ function mergeSyncResults(a: SyncResult, b: SyncResult): SyncResult {
       ...a,
       players: a.players ?? [],
       playerMatchStats: a.playerMatchStats ?? [],
+      lineups: a.lineups ?? [],
+      injuries: a.injuries ?? [],
     }),
     {
       ...b,
       players: b.players ?? [],
       playerMatchStats: b.playerMatchStats ?? [],
+      lineups: b.lineups ?? [],
+      injuries: b.injuries ?? [],
     },
   );
   return {
@@ -181,6 +189,8 @@ function mergeSyncResults(a: SyncResult, b: SyncResult): SyncResult {
     matches: cache.matches,
     players: cache.players,
     playerMatchStats: cache.playerMatchStats,
+    lineups: cache.lineups,
+    injuries: cache.injuries,
   };
 }
 

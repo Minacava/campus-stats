@@ -83,6 +83,34 @@ export interface PlayerMatchStats {
   sources: SourceRef[];
 }
 
+/** One player appearance in a match squad / lineup. */
+export interface LineupEntry {
+  id: string;
+  matchId: string;
+  teamId: string;
+  playerId: string;
+  /** True when the player has a recorded on-pitch position interval. */
+  started: boolean;
+  jerseyNumber?: number | null;
+  sources: SourceRef[];
+}
+
+/**
+ * Injury / availability record.
+ * Open StatsBomb data does not include injuries — this shape is reserved for
+ * future adapters; the CLI currently returns an empty list.
+ */
+export interface InjuryRecord {
+  id: string;
+  playerId: string;
+  teamId?: string;
+  status: "injured" | "doubtful" | "suspended" | "unknown";
+  description?: string;
+  fromDate?: string;
+  toDate?: string;
+  sources: SourceRef[];
+}
+
 /** In-memory / on-disk cache shape (JSON file in v0). */
 export interface CampoCache {
   competitions: Competition[];
@@ -93,4 +121,6 @@ export interface CampoCache {
   identities: CanonicalIdentity[];
   players: Player[];
   playerMatchStats: PlayerMatchStats[];
+  lineups: LineupEntry[];
+  injuries: InjuryRecord[];
 }

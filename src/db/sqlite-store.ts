@@ -3,6 +3,8 @@ import type { CampoCache } from "../types.js";
 import type { CanonicalIdentity } from "../identity/types.js";
 import type {
   Competition,
+  InjuryRecord,
+  LineupEntry,
   Match,
   Player,
   PlayerMatchStats,
@@ -73,6 +75,25 @@ CREATE TABLE IF NOT EXISTS player_match_stats (
   red_cards INTEGER NOT NULL,
   sources_json TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS lineups (
+  id TEXT PRIMARY KEY,
+  match_id TEXT NOT NULL,
+  team_id TEXT NOT NULL,
+  player_id TEXT NOT NULL,
+  started INTEGER NOT NULL,
+  jersey_number INTEGER,
+  sources_json TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS injuries (
+  id TEXT PRIMARY KEY,
+  player_id TEXT NOT NULL,
+  team_id TEXT,
+  status TEXT NOT NULL,
+  description TEXT,
+  from_date TEXT,
+  to_date TEXT,
+  sources_json TEXT NOT NULL
+);
 `;
 
 function j(value: unknown): string {
@@ -108,6 +129,8 @@ export class SqliteStore {
         "identities",
         "players",
         "player_match_stats",
+        "lineups",
+        "injuries",
       ]) {
         this.db.prepare(`DELETE FROM ${table}`).run();
       }
@@ -222,6 +245,35 @@ export class SqliteStore {
         sources: parseJson(String(row.sources_json)),
       })) satisfies PlayerMatchStats[];
 
+    const lineups = this.db
+      .prepare("SELECT * FROM lineups")
+      .all()
+      .map((row) => ({
+        id: String(row.id),
+        matchId: String(row.match_id),
+        teamId: String(row.team_id),
+        playerId: String(row.player_id),
+        started: Boolean(row.started),
+        jerseyNumber:
+          row.jersey_number == null ? null : Number(row.jersey_number),
+        sources: parseJson(String(row.sources_json)),
+      })) satisfies LineupEntry[];
+
+    const injuries = this.db
+      .prepare("SELECT * FROM injuries")
+      .all()
+      .map((row) => ({
+        id: String(row.id),
+        playerId: String(row.player_id),
+        teamId: row.team_id == null ? undefined : String(row.team_id),
+        status: String(row.status) as InjuryRecord["status"],
+        description:
+          row.description == null ? undefined : String(row.description),
+        fromDate: row.from_date == null ? undefined : String(row.from_date),
+        toDate: row.to_date == null ? undefined : String(row.to_date),
+        sources: parseJson(String(row.sources_json)),
+      })) satisfies InjuryRecord[];
+
     return {
       competitions,
       seasons,
@@ -230,6 +282,8 @@ export class SqliteStore {
       identities,
       players,
       playerMatchStats,
+      lineups,
+      injuries,
     };
   }
 
@@ -353,6 +407,50 @@ export class SqliteStore {
         s.yellowCards,
         s.redCards,
         j(s.sources),
+      );
+    }
+
+    const upsertLineup = this.db.prepare(
+      `INSERT INTO lineups (
+         id, match_id, team_id, player_id, started, jersey_number, sources_json
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         match_id=excluded.match_id, team_id=excluded.team_id,
+         player_id=excluded.player_id, started=excluded.started,
+         jersey_number=excluded.jersey_number, sources_json=excluded.sources_json`,
+    );
+    for (const l of cache.lineups) {
+      upsertLineup.run(
+        l.id,
+        l.matchId,
+        l.teamId,
+        l.playerId,
+        l.started ? 1 : 0,
+        l.jerseyNumber ?? null,
+        j(l.sources),
+      );
+    }
+
+    const upsertInjury = this.db.prepare(
+      `INSERT INTO injuries (
+         id, player_id, team_id, status, description, from_date, to_date, sources_json
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         player_id=excluded.player_id, team_id=excluded.team_id,
+         status=excluded.status, description=excluded.description,
+         from_date=excluded.from_date, to_date=excluded.to_date,
+         sources_json=excluded.sources_json`,
+    );
+    for (const i of cache.injuries) {
+      upsertInjury.run(
+        i.id,
+        i.playerId,
+        i.teamId ?? null,
+        i.status,
+        i.description ?? null,
+        i.fromDate ?? null,
+        i.toDate ?? null,
+        j(i.sources),
       );
     }
   }
