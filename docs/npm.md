@@ -27,8 +27,8 @@ Package page: https://www.npmjs.com/package/campus-stats
 On `main`, after merge:
 
 ```bash
-git tag v0.4.0
-git push origin v0.4.0
+git tag v0.4.1
+git push origin v0.4.1
 ```
 
 CI runs `test`, then:
@@ -38,6 +38,8 @@ CI runs `test`, then:
 
 The package `name` in `package.json` must stay **`campus-stats`** (unscoped).
 The product brand remains **Campus**; CLI bins are `campus` and `campus-stats`.
+Public links on the npm page point at **`marina34/campus-docs`** (and Pages), not
+the private source repository.
 
 ## Local dry-run
 

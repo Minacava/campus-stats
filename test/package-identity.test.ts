@@ -19,12 +19,16 @@ describe("campus-stats package identity", () => {
       name: string;
       version: string;
       bin: Record<string, string>;
+      homepage?: string;
+      repository?: { type?: string; url?: string };
     };
     assert.equal(pkg.name, "campus-stats");
     assert.ok(pkg.version.startsWith("0.4"));
     assert.equal(pkg.bin.campus, "./dist/cli.js");
     assert.equal(pkg.bin["campus-stats"], "./dist/cli.js");
     assert.equal(pkg.bin["campo-stats"], undefined);
+    assert.match(pkg.repository?.url ?? "", /marina34\/campus-docs\.git/);
+    assert.match(pkg.homepage ?? "", /marina34\.gitlab\.io\/campus-docs/);
   });
 
   it("uses .campus cache paths and CampusClient export", () => {
