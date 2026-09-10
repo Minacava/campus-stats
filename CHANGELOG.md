@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.4
+
 - npm `repository` / `bugs` → https://github.com/Minacava/campus-stats
   (`homepage` stays on the public docs site)
 
