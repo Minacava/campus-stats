@@ -1,37 +1,43 @@
-# Epic 00 — Fundación v0 (esquema, StatsBomb, CLI, caché JSON)
+# Epic 00 — Foundation v0 (schema, StatsBomb, CLI, JSON cache)
 
-## Objetivo
+## Goal
 
-Dejar el núcleo del producto listo, documentado y verificable: esquema canónico, adapter StatsBomb, CLI de sync/query y caché JSON local con provenance.
+Ship a documented, verifiable product core: canonical schema, StatsBomb
+adapter, sync/query CLI, and local JSON cache with provenance.
 
-## Contexto
+## Context
 
-v0 ya está esbozado en el starter: `src/types.ts` define entidades provider-agnostic; cada fuente implementa `FootballSource` bajo `src/sources/`; el CLI y la caché nunca ven nombres crudos del proveedor. StatsBomb Open Data cubre Liga F, WSL, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup y UEFA Women's Euro.
+v0 is sketched in the starter: `src/types.ts` defines provider-agnostic
+entities; each source implements `FootballSource` under `src/sources/`; the
+CLI and cache never see provider raw field names. StatsBomb Open Data covers
+Liga F, WSL, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, and
+UEFA Women's Euro.
 
-**Licencia:** código MIT; datos sujetos a términos de cada fuente (crédito StatsBomb obligatorio en análisis publicados).
+**License:** code MIT; data subject to each source's terms (StatsBomb credit
+required for published analysis).
 
-## Criterios de hecho
+## Definition of done
 
-- `npm install && npm run build` funciona
-- `sync --competition "Liga F"` trae partidos reales de una temporada StatsBomb
-- Queries CLI listan competitions / seasons / teams / matches desde la caché
-- Un segundo `sync` de otra competición **mergea**, no borra
-- README del paquete documenta quickstart, esquema, términos de datos y cómo añadir adapters
+- `npm install && npm run build` works
+- `sync --competition "Liga F"` pulls real matches for a StatsBomb season
+- CLI queries list competitions / seasons / teams / matches from the cache
+- A second `sync` for another competition **merges**, does not wipe
+- Package README documents quickstart, schema, data terms, and how to add adapters
 
 ## Tasks
 
-- [x] Inventariar el código existente (types, sources, CLI, cache) y alinear el README del repo con la visión Campus / campo-stats
-- [x] Definir y documentar el esquema canónico `Competition`, `Season`, `Team`, `Match` (campos obligatorios vs opcionales)
-- [x] Completar / endurecer el adapter StatsBomb (`FootballSource`) con mapeo estable y provenance `sources`
-- [x] Implementar caché JSON en `.campo-stats/cache.json` con merge por sync (no replace)
-- [x] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` con filtros documentados
-- [x] Tests de contrato: sync Liga F (o fixture offline) + query de un equipo en una temporada
-- [x] Documentar términos StatsBomb y obligación de crédito en README / cabecera del adapter
-- [x] Checklist de “contribución de adapters”: interfaz `FootballSource`, normalización, docs de límites/API keys
+- [x] Inventory existing code (types, sources, CLI, cache) and align the repo README with the Campus / campo-stats vision
+- [x] Define and document the canonical `Competition`, `Season`, `Team`, `Match` schema (required vs optional fields)
+- [x] Complete / harden the StatsBomb adapter (`FootballSource`) with stable mapping and `sources` provenance
+- [x] Implement JSON cache at `.campo-stats/cache.json` with merge-on-sync (not replace)
+- [x] CLI: `sync --competition`, `competitions`, `seasons`, `teams`, `matches` with documented filters
+- [x] Contract tests: Liga F sync (or offline fixture) + query a team in a season
+- [x] Document StatsBomb terms and credit obligation in README / adapter header
+- [x] Adapter contribution checklist: `FootballSource` interface, normalization, limits/API key docs
 
-## Criterios de hecho — estado
+## Definition of done — status
 
-Epic 00 tasks completadas. Verificar localmente:
+Epic 00 tasks complete. Verify locally:
 
 ```bash
 npm install && npm run build && npm test

@@ -1,10 +1,14 @@
 #!/usr/bin/env node
+import { cachePath } from "./cache.js";
 import {
-  cachePath,
-  loadCache,
-  mergeSyncResult,
-  saveCache,
-} from "./cache.js";
+  readStore,
+  resolveDbPath,
+  resolveStoreMode,
+  runMigrate,
+  writeCacheToStore,
+  writeSyncToStore,
+  type StoreMode,
+} from "./db/store-api.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
@@ -12,28 +16,42 @@ import { StatsBombSource } from "./sources/statsbomb.js";
 import type { FootballSource } from "./sources/types.js";
 import type { CampoCache } from "./types.js";
 
+let storeMode: StoreMode = "json";
+let dbPath = ".campo-stats/campo-stats.sqlite";
+
 function usage(): never {
   console.error(`campo-stats — women's football data CLI
 
 Usage:
-  campo-stats sync --competition <name> [--source statsbomb|fbref]
+  campo-stats sync --competition <name> [--source statsbomb|fbref] [--with-players] [--player-stats-limit <n>]
   campo-stats competitions
   campo-stats seasons --competition <name>
   campo-stats teams --competition <name>
   campo-stats matches --competition <name> [--season <name>] [--team <name>]
+  campo-stats players [--team <name>] [--name <name>]
+  campo-stats player-stats [--competition <name>] [--match <id>] [--player <name>] [--team <name>]
   campo-stats identities [--status resolved|pending|rejected]
   campo-stats identities propose --competition <name>
   campo-stats identities confirm --id <identityId>
   campo-stats identities reject --id <identityId>
+  campo-stats migrate [--db <path>]
 
 Options:
-  --competition <name>  Competition display name (e.g. "Liga F")
-  --source <id>         Data source for sync (default: statsbomb)
-  --season <name>       Season label (e.g. "2023/2024")
-  --team <name>         Team name substring (case-insensitive)
-  --status <status>     Filter identities list
-  --id <identityId>     Identity id for confirm/reject
-  --help                Show this help
+  --competition <name>       Competition display name (e.g. "Liga F")
+  --source <id>              Data source for sync (default: statsbomb)
+  --with-players             StatsBomb only: also sync v1 player match stats
+  --player-stats-limit <n>   Max matches to enrich (default 5)
+  --season <name>            Season label (e.g. "2023/2024")
+  --team <name>              Team name substring (case-insensitive)
+  --player <name>            Player name substring
+  --name <name>              Player name substring (players command)
+  --match <id>               Match id filter
+  --status <status>          Filter identities list
+  --id <identityId>          Identity id for confirm/reject
+  --sqlite                   Use SQLite store (default path .campo-stats/campo-stats.sqlite)
+  --db <path>                SQLite database path (implies --sqlite)
+  --json                     Force JSON cache (default)
+  --help                     Show this help
 `);
   process.exit(1);
 }
@@ -46,6 +64,10 @@ function getFlag(args: string[], name: string): string | undefined {
     throw new Error(`Missing value for ${name}`);
   }
   return value;
+}
+
+function hasFlag(args: string[], name: string): boolean {
+  return args.includes(name);
 }
 
 function includesCI(haystack: string, needle: string): boolean {
@@ -72,11 +94,22 @@ async function cmdSync(args: string[]): Promise<void> {
   const competition = getFlag(args, "--competition");
   if (!competition) usage();
   const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
+  const withPlayers = hasFlag(args, "--with-players");
+  const limitRaw = getFlag(args, "--player-stats-limit");
+  const playerStatsLimit = limitRaw ? Number(limitRaw) : 5;
 
   let source: FootballSource;
   if (sourceId === "statsbomb") {
-    source = new StatsBombSource();
+    source = new StatsBombSource({
+      includePlayerStats: withPlayers,
+      playerStatsLimit,
+    });
   } else if (sourceId === "fbref") {
+    if (withPlayers) {
+      throw new Error(
+        "FBref player stats are not available yet (see docs/fbref-player-stats-deferred.md).",
+      );
+    }
     source = new FbrefSource();
   } else {
     throw new Error(`Unknown source: "${sourceId}". Use statsbomb or fbref.`);
@@ -84,23 +117,26 @@ async function cmdSync(args: string[]): Promise<void> {
 
   console.error(`Syncing "${competition}" from ${source.id}…`);
   const result = await source.syncCompetition(competition);
-  const cache = mergeSyncResult(await loadCache(), result);
-  await saveCache(cache);
+  const cache = await writeSyncToStore(storeMode, dbPath, result);
 
   console.log(
     JSON.stringify(
       {
         source: source.id,
-        cache: cachePath(),
+        cache: storeMode === "json" ? cachePath() : dbPath,
         competition: result.competitions[0]?.name,
         seasons: result.seasons.length,
         teams: result.teams.length,
         matches: result.matches.length,
+        players: result.players?.length ?? 0,
+        playerMatchStats: result.playerMatchStats?.length ?? 0,
         totals: {
           competitions: cache.competitions.length,
           seasons: cache.seasons.length,
           teams: cache.teams.length,
           matches: cache.matches.length,
+          players: cache.players.length,
+          playerMatchStats: cache.playerMatchStats.length,
         },
       },
       null,
@@ -110,7 +146,7 @@ async function cmdSync(args: string[]): Promise<void> {
 }
 
 async function cmdCompetitions(): Promise<void> {
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   console.log(
     JSON.stringify(
       cache.competitions.map((c) => ({
@@ -127,7 +163,7 @@ async function cmdCompetitions(): Promise<void> {
 async function cmdSeasons(args: string[]): Promise<void> {
   const name = getFlag(args, "--competition");
   if (!name) usage();
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, name);
   const seasons = cache.seasons.filter((s) => s.competitionId === competition.id);
   console.log(
@@ -142,7 +178,7 @@ async function cmdSeasons(args: string[]): Promise<void> {
 async function cmdTeams(args: string[]): Promise<void> {
   const name = getFlag(args, "--competition");
   if (!name) usage();
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, name);
   const seasonIds = new Set(
     cache.seasons
@@ -174,7 +210,7 @@ async function cmdMatches(args: string[]): Promise<void> {
   const seasonName = getFlag(args, "--season");
   const teamName = getFlag(args, "--team");
 
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const competition = requireCompetition(cache, competitionName);
   let seasonId: string | undefined;
   if (seasonName) {
@@ -224,13 +260,104 @@ async function cmdMatches(args: string[]): Promise<void> {
   );
 }
 
+async function cmdPlayers(args: string[]): Promise<void> {
+  const teamName = getFlag(args, "--team");
+  const name = getFlag(args, "--name");
+  const cache = await readStore(storeMode, dbPath);
+  const teamById = new Map(cache.teams.map((t) => [t.id, t]));
+  const teamIds = teamName
+    ? new Set(
+        cache.teams
+          .filter((t) => includesCI(t.name, teamName))
+          .map((t) => t.id),
+      )
+    : null;
+
+  let players = cache.players;
+  if (name) players = players.filter((p) => includesCI(p.name, name));
+  if (teamIds) {
+    const playerIds = new Set(
+      cache.playerMatchStats
+        .filter((s) => teamIds.has(s.teamId))
+        .map((s) => s.playerId),
+    );
+    players = players.filter((p) => playerIds.has(p.id));
+  }
+
+  console.log(
+    JSON.stringify(
+      players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        nickname: p.nickname,
+        country: p.country,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdPlayerStats(args: string[]): Promise<void> {
+  const competitionName = getFlag(args, "--competition");
+  const matchId = getFlag(args, "--match");
+  const playerName = getFlag(args, "--player");
+  const teamName = getFlag(args, "--team");
+  const cache = await readStore(storeMode, dbPath);
+
+  let competitionId: string | undefined;
+  if (competitionName) {
+    competitionId = requireCompetition(cache, competitionName).id;
+  }
+
+  const matchIds = new Set(
+    cache.matches
+      .filter((m) => (competitionId ? m.competitionId === competitionId : true))
+      .filter((m) => (matchId ? m.id === matchId || m.id.endsWith(`:${matchId}`) : true))
+      .map((m) => m.id),
+  );
+
+  const playerById = new Map(cache.players.map((p) => [p.id, p]));
+  const teamById = new Map(cache.teams.map((t) => [t.id, t]));
+
+  const rows = cache.playerMatchStats.filter((s) => {
+    if (!matchIds.has(s.matchId)) return false;
+    if (playerName) {
+      const n = playerById.get(s.playerId)?.name ?? "";
+      if (!includesCI(n, playerName)) return false;
+    }
+    if (teamName) {
+      const n = teamById.get(s.teamId)?.name ?? "";
+      if (!includesCI(n, teamName)) return false;
+    }
+    return true;
+  });
+
+  console.log(
+    JSON.stringify(
+      rows.map((s) => ({
+        matchId: s.matchId,
+        player: playerById.get(s.playerId)?.name,
+        team: teamById.get(s.teamId)?.name,
+        minutes: s.minutes,
+        goals: s.goals,
+        assists: s.assists,
+        yellowCards: s.yellowCards,
+        redCards: s.redCards,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
 async function cmdIdentities(args: string[]): Promise<void> {
   const sub = args[0];
   if (sub === "propose") {
     const competition = getFlag(args, "--competition");
     if (!competition) usage();
-    const cache = proposeIdentitiesForCompetition(await loadCache(), competition);
-    await saveCache(cache);
+    const cache = proposeIdentitiesForCompetition(await readStore(storeMode, dbPath), competition);
+    await writeCacheToStore(storeMode, dbPath, cache);
     console.log(
       JSON.stringify(
         {
@@ -250,18 +377,18 @@ async function cmdIdentities(args: string[]): Promise<void> {
     const id = getFlag(args, "--id");
     if (!id) usage();
     const status = sub === "confirm" ? "resolved" : "rejected";
-    const before = await loadCache();
+    const before = await readStore(storeMode, dbPath);
     if (!before.identities.some((i) => i.id === id)) {
       throw new Error(`Identity not found: ${id}`);
     }
     const cache = setIdentityStatus(before, id, status);
-    await saveCache(cache);
+    await writeCacheToStore(storeMode, dbPath, cache);
     console.log(JSON.stringify(cache.identities.find((i) => i.id === id), null, 2));
     return;
   }
 
   const status = getFlag(args, "--status");
-  const cache = await loadCache();
+  const cache = await readStore(storeMode, dbPath);
   const identities = cache.identities.filter((i) =>
     status ? i.status === status : true,
   );
@@ -271,6 +398,10 @@ async function cmdIdentities(args: string[]): Promise<void> {
 async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   if (!command || command === "--help" || args.includes("--help")) usage();
+
+  const allArgs = process.argv.slice(2);
+  storeMode = resolveStoreMode(allArgs);
+  dbPath = resolveDbPath(allArgs);
 
   switch (command) {
     case "sync":
@@ -288,8 +419,17 @@ async function main(): Promise<void> {
     case "matches":
       await cmdMatches(args);
       break;
+    case "players":
+      await cmdPlayers(args);
+      break;
+    case "player-stats":
+      await cmdPlayerStats(args);
+      break;
     case "identities":
       await cmdIdentities(args);
+      break;
+    case "migrate":
+      await runMigrate(args);
       break;
     default:
       usage();

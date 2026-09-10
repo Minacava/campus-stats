@@ -9,24 +9,23 @@ formats. `campo-stats` doesn't generate new data — it fetches from
 providers who already publish it, and normalizes everything into one
 schema so you can query Liga F, the WSL, the NWSL, etc. the same way.
 
-> **Name:** `campus` was already taken on npm, so the package is
-> `campo-stats` ("campo" = pitch/field in Spanish).
+The npm package name is `campo-stats`.
 
-## Plan de trabajo
+## Work plan
 
-Epics y tasks (checklists): [`docs/epics/`](./docs/epics/README.md).  
-Inventario inicial del repo: [`docs/inventory-v0.md`](./docs/inventory-v0.md).
+Epics and tasks (checklists): [`docs/epics/`](./docs/epics/README.md).  
+Initial repo inventory: [`docs/inventory-v0.md`](./docs/inventory-v0.md).
 
-| Epic | Descripción |
+| Epic | Description |
 |------|-------------|
-| [00 — Fundación v0](./docs/epics/00-fundacion-v0.md) | Esquema, StatsBomb, CLI, caché JSON |
-| [01 — Adapter FBref](./docs/epics/01-adapter-fbref.md) | Segunda fuente pública |
-| [02 — Identidad](./docs/epics/02-resolucion-identidad.md) | Resolución cross-source |
-| [03 — Stats jugadora](./docs/epics/03-stats-jugadora.md) | Stats a nivel jugadora por partido |
-| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistencia más allá del JSON |
-| [05 — npm](./docs/epics/05-publicacion-npm.md) | Publicación del paquete |
+| [00 — Foundation v0](./docs/epics/00-fundacion-v0.md) | Schema, StatsBomb, CLI, JSON cache |
+| [01 — FBref adapter](./docs/epics/01-adapter-fbref.md) | Second public source |
+| [02 — Identity](./docs/epics/02-resolucion-identidad.md) | Cross-source resolution |
+| [03 — Player stats](./docs/epics/03-stats-jugadora.md) | Per-match player-level stats |
+| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
+| [05 — npm](./docs/epics/05-publicacion-npm.md) | Package publication |
 
-## Quickstart (objetivo v0)
+## Quickstart (v0 target)
 
 ```bash
 npm install
@@ -38,9 +37,19 @@ node dist/cli.js competitions
 node dist/cli.js seasons  --competition "Liga F"
 node dist/cli.js teams    --competition "Liga F"
 node dist/cli.js matches  --competition "Liga F" --season "2023/2024" --team "Barcelona"
+
+# optional: enrich a few matches with v1 player stats (StatsBomb)
+node dist/cli.js sync --competition "Liga F" --with-players --player-stats-limit 3
+node dist/cli.js players --name "Walsh"
+node dist/cli.js player-stats --competition "Liga F" --player "Walsh"
+
+# SQLite store (Node >= 22)
+node dist/cli.js migrate --db .campo-stats/campo-stats.sqlite
+node dist/cli.js sync --competition "Liga F" --sqlite
+node dist/cli.js competitions --sqlite
 ```
 
-Una vez publicado: `npx campo-stats sync ...` sin clonar el repo.
+Once published: `npx campo-stats sync ...` without cloning the repo.
 
 ## Why this shape
 
@@ -57,10 +66,10 @@ on that field.
 (not replaced) on every `sync`. Deliberate v0 choice — see Epic 04 for
 SQLite.
 
-## Estado actual
+## Current status
 
-Epics 00–02 implementados: fundación, FBref, identidad cross-source de equipos.
-Siguiente: Epic 03 (stats a nivel jugadora).
+Epics 00–04 done: foundation, FBref, identity, player stats, SQLite
+(`--sqlite` / `migrate`). Next: Epic 05 (npm).
 
 ## Data source & terms
 
@@ -96,13 +105,22 @@ node dist/cli.js sync --source fbref --competition "FA Women's Super League"
 node dist/cli.js sync --source fbref --competition "WSL"
 ```
 
+## Persistence
+
+- **Default:** `.campo-stats/cache.json` (`--json`)
+- **SQLite:** `.campo-stats/campo-stats.sqlite` with `--sqlite` or `--db <path>`
+- Migration: `node dist/cli.js migrate --db .campo-stats/campo-stats.sqlite`
+- Requirement: Node ≥ 22 (`node:sqlite`). Backup: copy the `.sqlite` / `cache.json` file.
+
+Details: [`docs/sqlite-engine.md`](./docs/sqlite-engine.md), [`docs/sqlite-schema.md`](./docs/sqlite-schema.md).
+
 ## Contributing
 
 Adapters: follow the checklist in
 [`docs/contributing-adapters.md`](./docs/contributing-adapters.md)
 (`FootballSource`, normalization, provenance, terms, offline tests).
 
-## Licencia
+## License
 
-Código: MIT (ver [`LICENSE`](./LICENSE)). Datos: sujetos a los términos de
-cada fuente — ver [Data source & terms](#data-source--terms).
+Code: MIT (see [`LICENSE`](./LICENSE)). Data: subject to each source's own
+terms — see [Data source & terms](#data-source--terms).

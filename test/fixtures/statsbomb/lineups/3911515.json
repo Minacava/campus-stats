@@ -1,0 +1,61 @@
+[
+  {
+    "team_id": 3282,
+    "team_name": "Real Madrid CF W",
+    "lineup": [
+      {
+        "player_id": 1001,
+        "player_name": "Ada Example",
+        "player_nickname": "Ada",
+        "country": {
+          "name": "Spain"
+        },
+        "cards": [
+          {
+            "card_type": "Yellow Card"
+          }
+        ],
+        "positions": [
+          {
+            "from": "00:00",
+            "to": "90:00"
+          }
+        ]
+      },
+      {
+        "player_id": 1002,
+        "player_name": "Bench Player",
+        "cards": [],
+        "positions": []
+      }
+    ]
+  },
+  {
+    "team_id": 937,
+    "team_name": "Barcelona WFC",
+    "lineup": [
+      {
+        "player_id": 2001,
+        "player_name": "Fridolina Rolfo",
+        "cards": [],
+        "positions": [
+          {
+            "from": "00:00",
+            "to": "90:00"
+          }
+        ]
+      },
+      {
+        "player_id": 2002,
+        "player_name": "Assist Maker",
+        "cards": [],
+        "positions": [
+          {
+            "from": "00:00",
+            "to": "90:00"
+          }
+        ]
+      }
+    ]
+  }
+]

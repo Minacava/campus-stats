@@ -1,0 +1,49 @@
+[
+  {
+    "type": {
+      "name": "Shot"
+    },
+    "player": {
+      "id": 2001,
+      "name": "Fridolina Rolfo"
+    },
+    "team": {
+      "id": 937
+    },
+    "shot": {
+      "outcome": {
+        "name": "Goal"
+      }
+    }
+  },
+  {
+    "type": {
+      "name": "Pass"
+    },
+    "player": {
+      "id": 2002,
+      "name": "Assist Maker"
+    },
+    "team": {
+      "id": 937
+    },
+    "pass": {
+      "goal_assist": true
+    }
+  },
+  {
+    "type": {
+      "name": "Pass"
+    },
+    "player": {
+      "id": 2002,
+      "name": "Assist Maker"
+    },
+    "team": {
+      "id": 937
+    },
+    "pass": {
+      "goal_assist": false
+    }
+  }
+]

@@ -1,27 +1,36 @@
-# Epic 03 — Stats a nivel jugadora por partido
+# Epic 03 — Player-level match stats
 
-## Objetivo
+## Goal
 
-Extender el esquema más allá de competición/temporada/equipo/partido hacia estadísticas individuales por partido, normalizadas entre fuentes.
+Extend the schema beyond competition/season/team/match toward individual
+per-match statistics, normalized across sources.
 
-## Contexto
+## Context
 
-StatsBomb publica event files ricos pero grandes; v0 los omite a propósito. Incorporarlos implica nuevas entidades, más volumen y, en la práctica, presión para abandonar “cargar todo el JSON en memoria” (ver Epic 04).
+StatsBomb publishes rich but large event files; v0 skips them on purpose.
+Ingesting them means new entities, more volume, and practical pressure to stop
+“loading the whole JSON into memory” (see Epic 04).
 
-## Criterios de hecho
+## Definition of done
 
-- Esquema documentado para `Player` y stats por partido (campos mínimos acordados)
-- Al menos StatsBomb expone un subconjunto usable de stats de jugadora
-- CLI puede listar/consultar stats por partido / jugadora / equipo
-- El volumen no rompe el flujo sync en una competición piloto
+- Documented schema for `Player` and per-match stats (agreed minimum fields)
+- At least StatsBomb exposes a usable player-stats subset
+- CLI can list/query stats by match / player / team
+- Volume does not break sync for a pilot competition
 
 ## Tasks
 
-- [ ] Diseñar entidades `Player` y `PlayerMatchStats` (o equivalente) alineadas al resto del schema
-- [ ] Decidir subconjunto v1 de métricas (goles, asistencias, minutos, tarjetas, etc.) vs eventos crudos
-- [ ] Extender adapter StatsBomb para event files / stats de jugadora con provenance
-- [ ] (Si Epic 01 listo) Mapear el equivalente disponible en FBref al mismo schema
-- [ ] Ampliar CLI: queries de jugadoras y stats por partido/temporada
-- [ ] Tests con fixture reducido de eventos (no subir dumps enormes al repo)
-- [ ] Documentar coste de sync y requisitos de almacenamiento
-- [ ] Coordinar con Epic 04 si el JSON en memoria deja de ser viable
+- [x] Design `Player` and `PlayerMatchStats` (or equivalent) aligned with the rest of the schema
+- [x] Decide v1 metrics subset (goals, assists, minutes, cards, etc.) vs raw events
+- [x] Extend the StatsBomb adapter for event files / player stats with provenance
+- [x] (If Epic 01 done) Map the FBref equivalent to the same schema — deferred (see docs/fbref-player-stats-deferred.md)
+- [x] Extend CLI: player and stats queries by match/season
+- [x] Tests with a reduced event fixture (no huge dumps in the repo)
+- [x] Document sync cost and storage requirements
+- [x] Coordinate with Epic 04 if in-memory JSON stops being viable
+
+## Definition of done — status
+
+Epic 03 complete for StatsBomb (FBref player stats deferred).
+With `--with-players`, JSON stays OK if `player-stats-limit` is low;
+full-season enrichment → Epic 04 (see note in `04-persistencia-sqlite.md`).
