@@ -1,4 +1,13 @@
-import type { Competition, Match, Player, PlayerMatchStats, Season, Team } from "../types.js";
+import type {
+  Competition,
+  InjuryRecord,
+  LineupEntry,
+  Match,
+  Player,
+  PlayerMatchStats,
+  Season,
+  Team,
+} from "../types.js";
 
 /** Result of syncing one competition from a provider into canonical entities. */
 export interface SyncResult {
@@ -8,6 +17,8 @@ export interface SyncResult {
   matches: Match[];
   players?: Player[];
   playerMatchStats?: PlayerMatchStats[];
+  lineups?: LineupEntry[];
+  injuries?: InjuryRecord[];
 }
 
 /**
