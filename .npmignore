@@ -1,0 +1,9 @@
+# Keep packing explicit via package.json "files".
+# Extra ignores for local artifacts if someone packs without files.
+.campo-stats/
+node_modules/
+src/
+test/
+docs/
+*.tgz
+.tsbuildinfo

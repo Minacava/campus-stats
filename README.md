@@ -1,126 +1,188 @@
 # Campus (`campo-stats`)
 
-Open, normalized, queryable data on women's football — competitions,
-seasons, teams and matches, pulled from scattered public sources into
-one consistent schema.
+**Open, normalized, queryable data for women's football.**
 
-Women's football data is real; it's just scattered across inconsistent
-formats. `campo-stats` doesn't generate new data — it fetches from
-providers who already publish it, and normalizes everything into one
-schema so you can query Liga F, the WSL, the NWSL, etc. the same way.
+`campo-stats` is a small Node.js CLI (and library) that pulls women's football
+stats from public sources that already publish them, normalizes everything into
+one schema, and lets you query competitions, seasons, teams, matches, and
+player stats the same way — whether the data came from StatsBomb, FBref, or a
+future adapter.
 
-The npm package name is `campo-stats`.
+It does **not** invent data. It does **not** publish to npmjs.com. You install
+the package from **this GitLab project**.
 
-## Work plan
+Requires **Node.js ≥ 22**.
 
-Epics and tasks (checklists): [`docs/epics/`](./docs/epics/README.md).  
-Initial repo inventory: [`docs/inventory-v0.md`](./docs/inventory-v0.md).
+---
 
-| Epic | Description |
-|------|-------------|
-| [00 — Foundation v0](./docs/epics/00-fundacion-v0.md) | Schema, StatsBomb, CLI, JSON cache |
-| [01 — FBref adapter](./docs/epics/01-adapter-fbref.md) | Second public source |
-| [02 — Identity](./docs/epics/02-resolucion-identidad.md) | Cross-source resolution |
-| [03 — Player stats](./docs/epics/03-stats-jugadora.md) | Per-match player-level stats |
-| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
-| [05 — npm](./docs/epics/05-publicacion-npm.md) | Package publication |
+## What problem it solves
 
-## Quickstart (v0 target)
+Women's football data exists, but it is scattered across inconsistent formats.
+Tools built for the men's game often skip it. If you want to answer simple
+questions like “how many matches did Barcelona play in Liga F 2023/24?” or
+“who scored in this WSL match?” without hand-merging CSVs, `campo-stats` is
+for you.
+
+## Use cases
+
+1. **Research / analytics notebooks**  
+   Sync Liga F or the WSL once, then query matches and player stats from a
+   local JSON or SQLite cache inside a Python/R/JS notebook workflow.
+
+2. **Journalism & reporting**  
+   Pull a season of fixtures and scores for a women's league, filter by team,
+   and export facts for a story — with provenance pointing back to StatsBomb
+   or FBref.
+
+3. **Product prototypes**  
+   Build a dashboard or API that treats Liga F, WSL, and NWSL through one
+   schema instead of writing a custom scraper per league.
+
+4. **Teaching & workshops**  
+   Demonstrate open-data football analytics with real women's competitions
+   (`sync` → local cache → query), without setting up a database server.
+
+5. **Cross-source experiments**  
+   Sync StatsBomb + FBref, then use `identities propose` to explore how the
+   same clubs are named differently across providers.
+
+---
+
+## Install from GitLab
+
+Packages live in this project's registry (not npmjs):
 
 ```bash
-npm install
-npm run build
-
-node dist/cli.js sync --competition "Liga F"
-
-node dist/cli.js competitions
-node dist/cli.js seasons  --competition "Liga F"
-node dist/cli.js teams    --competition "Liga F"
-node dist/cli.js matches  --competition "Liga F" --season "2023/2024" --team "Barcelona"
-
-# optional: enrich a few matches with v1 player stats (StatsBomb)
-node dist/cli.js sync --competition "Liga F" --with-players --player-stats-limit 3
-node dist/cli.js players --name "Walsh"
-node dist/cli.js player-stats --competition "Liga F" --player "Walsh"
-
-# SQLite store (Node >= 22)
-node dist/cli.js migrate --db .campo-stats/campo-stats.sqlite
-node dist/cli.js sync --competition "Liga F" --sqlite
-node dist/cli.js competitions --sqlite
+npm install campo-stats \
+  --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
 ```
 
-Once published: `npx campo-stats sync ...` without cloning the repo.
+Or download a release tarball from the Generic Package Registry (after a
+tagged release), for example:
+
+```bash
+npm install \
+  https://gitlab.com/api/v4/projects/86296665/packages/generic/campo-stats/0.1.0/campo-stats-0.1.0.tgz
+```
+
+Browse packages: https://gitlab.com/marina34/campus/-/packages  
+
+Full install options: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
+
+### Develop from a clone
+
+```bash
+git clone https://gitlab.com/marina34/campus.git
+cd campus
+npm install
+npm run build
+node dist/cli.js --help
+```
+
+---
+
+## How to use (CLI)
+
+All commands write/read a local store in the current directory:
+
+- Default: `.campo-stats/cache.json`
+- Optional: SQLite with `--sqlite` or `--db <path>`
+
+### 1. Sync a competition
+
+```bash
+# StatsBomb (default) — real open data
+npx campo-stats sync --competition "Liga F"
+
+# FBref pilot (schedule HTML; may be blocked by Cloudflare on some networks)
+npx campo-stats sync --source fbref --competition "WSL"
+```
+
+A second sync **merges** into the same cache; it does not wipe previous leagues.
+
+### 2. Query what you synced
+
+```bash
+npx campo-stats competitions
+npx campo-stats seasons --competition "Liga F"
+npx campo-stats teams --competition "Liga F"
+npx campo-stats matches --competition "Liga F" --season "2023/2024" --team "Barcelona"
+```
+
+### 3. Optional player match stats (StatsBomb)
+
+Event files are large, so enrichment is capped (default 5 matches):
+
+```bash
+npx campo-stats sync --competition "Liga F" --with-players --player-stats-limit 3
+npx campo-stats players --name "Walsh"
+npx campo-stats player-stats --competition "Liga F" --player "Walsh"
+```
+
+### 4. Optional cross-source team identities
+
+After you have teams from two sources in the cache:
+
+```bash
+npx campo-stats identities propose --competition "Liga F"
+npx campo-stats identities --status pending
+npx campo-stats identities confirm --id identity:team:barcelona
+```
+
+### 5. Optional SQLite store
+
+```bash
+npx campo-stats migrate --db .campo-stats/campo-stats.sqlite
+npx campo-stats sync --competition "Liga F" --sqlite
+npx campo-stats competitions --sqlite
+```
+
+---
+
+## Supported data (v0.1)
+
+| Source | What you get | Notes |
+|--------|----------------|-------|
+| **StatsBomb Open Data** | Competitions, seasons, teams, matches; optional player stats | Liga F, FA WSL, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, UEFA Women's Euro |
+| **FBref** | Schedule → competitions / seasons / teams / matches | Pilots: WSL, Liga F. Live HTML may hit Cloudflare; CI uses fixtures |
+
+---
 
 ## Why this shape
 
-**One canonical schema, adapters do the translating.** `src/types.ts`
-defines `Competition`, `Season`, `Team`, `Match`. Each provider under
-`src/sources/` implements `FootballSource` and returns data already
-mapped. The CLI and cache never see a provider's raw field names.
+- **One canonical schema** (`Competition`, `Season`, `Team`, `Match`, …). Adapters translate; the CLI never sees provider field names.
+- **Provenance on every record** (`sources: [{ source, id }]`) so cross-source identity is possible later.
+- **Local-first cache** (JSON by default, SQLite optional) — no hosted database required.
 
-**Every record keeps its provenance.** Entities carry
-`sources: [{ source, id }]`. Cross-source identity resolution will lean
-on that field.
+---
 
-**Local cache is a plain JSON file.** `.campo-stats/cache.json`, merged
-(not replaced) on every `sync`. Deliberate v0 choice — see Epic 04 for
-SQLite.
+## Project plan & docs
 
-## Current status
+| Epic | Description |
+|------|-------------|
+| [00 — Foundation](./docs/epics/00-fundacion-v0.md) | Schema, StatsBomb, CLI, JSON cache |
+| [01 — FBref](./docs/epics/01-adapter-fbref.md) | Second public source |
+| [02 — Identity](./docs/epics/02-resolucion-identidad.md) | Cross-source team resolution |
+| [03 — Player stats](./docs/epics/03-stats-jugadora.md) | Per-match player stats |
+| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
+| [05 — Package](./docs/epics/05-publicacion-npm.md) | GitLab package distribution |
 
-Epics 00–04 done: foundation, FBref, identity, player stats, SQLite
-(`--sqlite` / `migrate`). Next: Epic 05 (npm).
+More: [`docs/epics/`](./docs/epics/README.md) · [`docs/versioning.md`](./docs/versioning.md) · [`CHANGELOG.md`](./CHANGELOG.md)
+
+---
 
 ## Data source & terms
 
-v0 ships adapters for:
+**Code is MIT. Data is not ours to relicense.**
 
-- [StatsBomb Open Data](https://github.com/statsbomb/open-data) — Liga F, FA Women's
-  Super League, Frauen-Bundesliga, Serie A Women, NWSL, Women's World Cup, UEFA
-  Women's Euro (women's competitions only).
-- **FBref** (HTML schedule pages) — pilots documented in
-  [`docs/fbref-pilot.md`](./docs/fbref-pilot.md) (WSL + Liga F). Live fetches use a
-  rate-limited client; Cloudflare may block some networks — fixtures cover CI.
-
-**This code is MIT. The data is not ours to relicense.**
-
-- StatsBomb: free for research and genuine football-analytics use. If you publish
-  analysis built on it, credit StatsBomb (see their
-  [media pack](https://statsbomb.com/media-pack/)). Notice also in
-  [`src/sources/statsbomb.ts`](./src/sources/statsbomb.ts).
+- [StatsBomb Open Data](https://github.com/statsbomb/open-data): free for research and genuine football analytics. Credit StatsBomb in published analysis ([media pack](https://statsbomb.com/media-pack/)).
 - FBref / Sports Reference: respect site terms, `robots.txt`, and rate limits.
-  Notice in [`src/sources/fbref.ts`](./src/sources/fbref.ts).
 
-Pass those requirements downstream — do not strip them out.
+Pass those requirements downstream.
 
-### Sync examples
-
-```bash
-# StatsBomb (default)
-node dist/cli.js sync --competition "Liga F"
-
-# FBref pilot (WSL)
-node dist/cli.js sync --source fbref --competition "FA Women's Super League"
-# alias:
-node dist/cli.js sync --source fbref --competition "WSL"
-```
-
-## Persistence
-
-- **Default:** `.campo-stats/cache.json` (`--json`)
-- **SQLite:** `.campo-stats/campo-stats.sqlite` with `--sqlite` or `--db <path>`
-- Migration: `node dist/cli.js migrate --db .campo-stats/campo-stats.sqlite`
-- Requirement: Node ≥ 22 (`node:sqlite`). Backup: copy the `.sqlite` / `cache.json` file.
-
-Details: [`docs/sqlite-engine.md`](./docs/sqlite-engine.md), [`docs/sqlite-schema.md`](./docs/sqlite-schema.md).
-
-## Contributing
-
-Adapters: follow the checklist in
-[`docs/contributing-adapters.md`](./docs/contributing-adapters.md)
-(`FootballSource`, normalization, provenance, terms, offline tests).
+---
 
 ## License
 
-Code: MIT (see [`LICENSE`](./LICENSE)). Data: subject to each source's own
-terms — see [Data source & terms](#data-source--terms).
+Code: MIT (see [`LICENSE`](./LICENSE)). Data: subject to each source's terms —
+see [Data source & terms](#data-source--terms).
