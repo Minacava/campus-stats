@@ -27,4 +27,4 @@ Tipos en [`src/types.ts`](../src/types.ts).
 | `sources` | sí | |
 | `minutes` | no | Minutos jugados; `null` si desconocido |
 
-Las métricas v1 se detallan en la siguiente task / `docs/player-stats-metrics.md`.
+Las métricas v1 se detallan en [`player-stats-metrics.md`](./player-stats-metrics.md).
