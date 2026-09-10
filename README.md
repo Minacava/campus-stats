@@ -8,9 +8,6 @@ one schema, and lets you query competitions, seasons, teams, matches, and
 player stats the same way — whether the data came from StatsBomb, FBref, or a
 future adapter.
 
-It does **not** invent data. It does **not** publish to npmjs.com. You install
-the package from **this GitLab project**.
-
 Requires **Node.js ≥ 22**.
 
 ---
@@ -91,14 +88,29 @@ All commands write/read a local store in the current directory:
 ### 1. Sync a competition
 
 ```bash
-# StatsBomb (default) — real open data
+# StatsBomb (default)
 npx campo-stats sync --competition "Liga F"
 
 # FBref pilot (schedule HTML; may be blocked by Cloudflare on some networks)
 npx campo-stats sync --source fbref --competition "WSL"
 ```
 
-A second sync **merges** into the same cache; it does not wipe previous leagues.
+### Update with new data
+
+There is no separate “update” command. Re-run `sync` when you want fresh data
+from the sources:
+
+```bash
+# Same competition again — pulls latest and merges into the local cache
+npx campo-stats sync --competition "Liga F"
+
+# Add another competition without wiping what you already have
+npx campo-stats sync --competition "FA Women's Super League"
+```
+
+Each sync **merges** into `.campo-stats/cache.json` (or your SQLite DB). It
+does not wipe previous leagues. Existing records are updated when the source
+sends newer values; new matches/teams are appended.
 
 ### 2. Query what you synced
 
