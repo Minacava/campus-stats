@@ -52,4 +52,6 @@ Tipos en [`src/types.ts`](../src/types.ts). Los adapters traducen campos crudos 
 
 ## `CampoCache`
 
-Contenedor de arrays: `competitions`, `seasons`, `teams`, `matches`. Persistido en v0 como `.campo-stats/cache.json`.
+Contenedor de arrays: `competitions`, `seasons`, `teams`, `matches`,
+`identities`, `players`, `playerMatchStats`. Persistido en v0 como
+`.campo-stats/cache.json`.
