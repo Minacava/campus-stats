@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { createRequire } from "node:module";
 import type { CampoCache } from "../types.js";
 import type { CanonicalIdentity } from "../identity/types.js";
 import type {
@@ -9,6 +9,9 @@ import type {
   Season,
   Team,
 } from "../types.js";
+
+type DatabaseSync = import("node:sqlite").DatabaseSync;
+const require = createRequire(import.meta.url);
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS competitions (
@@ -84,6 +87,8 @@ export class SqliteStore {
   private readonly db: DatabaseSync;
 
   constructor(dbPath: string) {
+    // Lazy-load so --help and JSON-only flows do not touch experimental node:sqlite.
+    const { DatabaseSync } = require("node:sqlite") as typeof import("node:sqlite");
     this.db = new DatabaseSync(dbPath);
     this.db.exec(SCHEMA_SQL);
   }
