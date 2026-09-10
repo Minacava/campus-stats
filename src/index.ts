@@ -7,6 +7,8 @@ export type {
   Match,
   Player,
   PlayerMatchStats,
+  LineupEntry,
+  InjuryRecord,
   CampoCache,
 } from "./types.js";
 export type {
@@ -45,3 +47,16 @@ export {
   dataBundleUrl,
   dataBundleMetaUrl,
 } from "./data-bundle.js";
+export { CampoClient } from "./client.js";
+export type { SquadMember } from "./client.js";
+export {
+  DEFAULT_FANTASY_RULES,
+  scorePlayerMatchStats,
+  scoreFantasyPoints,
+} from "./scoring.js";
+export type { FantasyScoringRules, FantasyPointRow } from "./scoring.js";
+export {
+  INJURIES_AVAILABLE,
+  INJURIES_STATUS_MESSAGE,
+  listInjuries,
+} from "./injuries.js";

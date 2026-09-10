@@ -10,18 +10,16 @@
  * (`competition_gender === "female"`).
  */
 
+import type { LineupEntry, Match, Player, PlayerMatchStats } from "../types.js";
+import { aggregateStatsBombPlayerMatch } from "./statsbomb-player-stats.js";
+import type { FootballSource, SyncResult } from "./types.js";
 import { entityId } from "../ids.js";
 import type {
   Competition,
-  Match,
-  Player,
-  PlayerMatchStats,
   Season,
   Team,
   TeamKind,
 } from "../types.js";
-import { aggregateStatsBombPlayerMatch } from "./statsbomb-player-stats.js";
-import type { FootballSource, SyncResult } from "./types.js";
 
 const SOURCE = "statsbomb";
 const BASE =
@@ -235,17 +233,23 @@ export class StatsBombSource implements FootballSource {
       );
       result.players = enriched.players;
       result.playerMatchStats = enriched.playerMatchStats;
+      result.lineups = enriched.lineups;
     }
 
     return result;
   }
 
-  /** Load aggregated v1 player stats for the given canonical matches. */
+  /** Load aggregated v1 player stats + lineups for the given canonical matches. */
   async loadPlayerStatsForMatches(
     matches: Match[],
-  ): Promise<{ players: Player[]; playerMatchStats: PlayerMatchStats[] }> {
+  ): Promise<{
+    players: Player[];
+    playerMatchStats: PlayerMatchStats[];
+    lineups: LineupEntry[];
+  }> {
     const players = new Map<string, Player>();
     const playerMatchStats: PlayerMatchStats[] = [];
+    const lineupEntries: LineupEntry[] = [];
 
     for (const match of matches) {
       const nativeId = match.sources.find((s) => s.source === SOURCE)?.id;
@@ -258,6 +262,7 @@ export class StatsBombSource implements FootballSource {
             player_id: number;
             player_name: string;
             player_nickname?: string | null;
+            jersey_number?: number | null;
             country?: { name?: string };
             cards?: Array<{ card_type?: string }>;
             positions?: Array<{ from?: string | null; to?: string | null }>;
@@ -277,8 +282,13 @@ export class StatsBombSource implements FootballSource {
       const agg = aggregateStatsBombPlayerMatch(match.id, lineups, events);
       for (const p of agg.players) players.set(p.id, p);
       playerMatchStats.push(...agg.playerMatchStats);
+      lineupEntries.push(...agg.lineups);
     }
 
-    return { players: [...players.values()], playerMatchStats };
+    return {
+      players: [...players.values()],
+      playerMatchStats,
+      lineups: lineupEntries,
+    };
   }
 }

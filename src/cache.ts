@@ -1,6 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { CampoCache, Competition, Match, Season, Team } from "./types.js";
+import type {
+  CampoCache,
+  Competition,
+  InjuryRecord,
+  LineupEntry,
+  Match,
+  Season,
+  Team,
+} from "./types.js";
 import type { SyncResult } from "./sources/types.js";
 
 export const DEFAULT_CACHE_DIR = ".campo-stats";
@@ -15,6 +23,8 @@ export function emptyCache(): CampoCache {
     identities: [],
     players: [],
     playerMatchStats: [],
+    lineups: [],
+    injuries: [],
   };
 }
 
@@ -34,6 +44,8 @@ export async function loadCache(filePath: string = cachePath()): Promise<CampoCa
       identities: parsed.identities ?? [],
       players: parsed.players ?? [],
       playerMatchStats: parsed.playerMatchStats ?? [],
+      lineups: parsed.lineups ?? [],
+      injuries: parsed.injuries ?? [],
     };
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
@@ -70,5 +82,7 @@ export function mergeSyncResult(cache: CampoCache, result: SyncResult): CampoCac
       cache.playerMatchStats,
       result.playerMatchStats ?? [],
     ),
+    lineups: mergeById<LineupEntry>(cache.lineups, result.lineups ?? []),
+    injuries: mergeById<InjuryRecord>(cache.injuries, result.injuries ?? []),
   };
 }

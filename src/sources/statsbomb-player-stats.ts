@@ -1,5 +1,5 @@
 import { entityId } from "../ids.js";
-import type { Player, PlayerMatchStats } from "../types.js";
+import type { LineupEntry, Player, PlayerMatchStats } from "../types.js";
 
 const SOURCE = "statsbomb";
 
@@ -19,6 +19,7 @@ interface SbLineupPlayer {
   player_id: number;
   player_name: string;
   player_nickname?: string | null;
+  jersey_number?: number | null;
   country?: { name?: string };
   cards?: SbCard[];
   positions?: SbPosition[];
@@ -75,10 +76,12 @@ function countCards(cards: SbCard[] | undefined): { yellow: number; red: number 
 export interface AggregatedPlayerMatch {
   players: Player[];
   playerMatchStats: PlayerMatchStats[];
+  lineups: LineupEntry[];
 }
 
 /**
- * Build Player + PlayerMatchStats for one match from StatsBomb lineups + events.
+ * Build Player + PlayerMatchStats + LineupEntry for one match
+ * from StatsBomb lineups + events.
  */
 export function aggregateStatsBombPlayerMatch(
   matchIdCampo: string,
@@ -101,6 +104,8 @@ export function aggregateStatsBombPlayerMatch(
 
   const players = new Map<string, Player>();
   const stats: PlayerMatchStats[] = [];
+  const lineupEntries: LineupEntry[] = [];
+  const matchNative = matchIdCampo.split(":").pop()!;
 
   for (const team of lineups) {
     const teamId = entityId(SOURCE, "team", team.team_id);
@@ -114,8 +119,9 @@ export function aggregateStatsBombPlayerMatch(
         sources: [{ source: SOURCE, id: String(p.player_id) }],
       });
       const cards = countCards(p.cards);
+      const started = (p.positions?.length ?? 0) > 0;
       stats.push({
-        id: entityId(SOURCE, "pstats", matchIdCampo.split(":").pop()!, p.player_id),
+        id: entityId(SOURCE, "pstats", matchNative, p.player_id),
         matchId: matchIdCampo,
         playerId,
         teamId,
@@ -127,12 +133,25 @@ export function aggregateStatsBombPlayerMatch(
         sources: [
           {
             source: SOURCE,
-            id: `${matchIdCampo.split(":").pop()}:${p.player_id}`,
+            id: `${matchNative}:${p.player_id}`,
           },
         ],
+      });
+      lineupEntries.push({
+        id: entityId(SOURCE, "lineup", matchNative, p.player_id),
+        matchId: matchIdCampo,
+        teamId,
+        playerId,
+        started,
+        jerseyNumber: p.jersey_number ?? null,
+        sources: [{ source: SOURCE, id: `${matchNative}:${p.player_id}` }],
       });
     }
   }
 
-  return { players: [...players.values()], playerMatchStats: stats };
+  return {
+    players: [...players.values()],
+    playerMatchStats: stats,
+    lineups: lineupEntries,
+  };
 }

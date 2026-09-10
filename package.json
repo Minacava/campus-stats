@@ -1,7 +1,7 @@
 {
   "name": "campo-stats",
-  "version": "0.1.0",
-  "description": "Open, normalized, queryable data on women's football",
+  "version": "0.2.0",
+  "description": "Installable women's football data layer for apps — clubs, national teams, matches, lineups, fantasy points",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,6 +32,7 @@
     "football",
     "soccer",
     "women",
+    "fantasy",
     "stats",
     "statsbomb",
     "cli"
