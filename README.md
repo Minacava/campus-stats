@@ -25,8 +25,8 @@ npx campus matches --competition "Liga F" --team "Barcelona"
 
 The CLI binaries are `campus` and `campus-stats` (same entrypoint).
 
-Maintainer publish setup: [`docs/npm.md`](./docs/npm.md).  
-Optional GitLab mirror: [`docs/gitlab-package.md`](./docs/gitlab-package.md).
+Docs: https://campus-tawny-mu.vercel.app/  
+Public docs repo: https://gitlab.com/marina34/campus-docs
 
 ---
 
@@ -117,33 +117,10 @@ Injuries are **not** in these open feeds yet — the API is ready, the list is e
 
 ---
 
-## Develop from a clone
+## Docs
 
-For contributors working on this repo:
-
-```bash
-git clone https://gitlab.com/marina34/campus.git
-cd campus
-npm install
-npm run build
-npm test
-npx campus --help
-```
-
----
-
-## Project plan & docs
-
-| Epic | Description |
-|------|-------------|
-| [00 — Foundation](./docs/epics/00-fundacion-v0.md) | Schema, StatsBomb, CLI, JSON cache |
-| [01 — FBref](./docs/epics/01-adapter-fbref.md) | Second public source |
-| [02 — Identity](./docs/epics/02-resolucion-identidad.md) | Cross-source team resolution |
-| [03 — Player stats](./docs/epics/03-stats-jugadora.md) | Per-match player stats |
-| [04 — SQLite](./docs/epics/04-persistencia-sqlite.md) | Persistence beyond JSON |
-| [05 — Package](./docs/epics/05-publicacion-npm.md) | npmjs + GitLab package distribution |
-
-More: [`docs/cron.md`](./docs/cron.md) · [`docs/injuries.md`](./docs/injuries.md) · [`docs/npm.md`](./docs/npm.md) · [`docs/gitlab-package.md`](./docs/gitlab-package.md) · [`CHANGELOG.md`](./CHANGELOG.md)
+- Product / install docs: https://campus-tawny-mu.vercel.app/
+- Docs source (public): https://gitlab.com/marina34/campus-docs
 
 ---
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2
+
+- `homepage` → https://campus-tawny-mu.vercel.app/
+- README on npm no longer links the private source clone URL; points at
+  public docs (`campus-docs` / Vercel)
+
 ## 0.4.1
 
 - Point npm `repository` / `homepage` / `bugs` at the public docs project

@@ -38,8 +38,11 @@ CI runs `test`, then:
 
 The package `name` in `package.json` must stay **`campus-stats`** (unscoped).
 The product brand remains **Campus**; CLI bins are `campus` and `campus-stats`.
-Public links on the npm page point at **`marina34/campus-docs`** (and Pages), not
-the private source repository.
+Public links on the npm page:
+
+- **homepage:** https://campus-tawny-mu.vercel.app/
+- **repository / bugs:** [`marina34/campus-docs`](https://gitlab.com/marina34/campus-docs)
+  (not the private source repository)
 
 ## Local dry-run
 
