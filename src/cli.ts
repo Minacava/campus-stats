@@ -19,42 +19,42 @@ import {
   syncFantasyBundle,
   updateCachedCompetitions,
 } from "./fantasy.js";
-import { CampoClient } from "./client.js";
+import { CampusClient } from "./client.js";
 import { INJURIES_STATUS_MESSAGE } from "./injuries.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
 import { FbrefSource } from "./sources/fbref.js";
 import { StatsBombSource } from "./sources/statsbomb.js";
 import type { FootballSource } from "./sources/types.js";
-import type { CampoCache } from "./types.js";
+import type { CampusCache } from "./types.js";
 
 let storeMode: StoreMode = "json";
-let dbPath = ".campo-stats/campo-stats.sqlite";
+let dbPath = ".campus/campus.sqlite";
 
 function usage(): never {
-  console.error(`campo-stats — women's football data CLI
+  console.error(`campus — women's football data CLI
 
 Usage:
-  campo-stats sync --fantasy|--all [--with-players] [--player-stats-limit <n>]
-  campo-stats sync --competition <name> [--source statsbomb|fbref] [--with-players] [--player-stats-limit <n>]
-  campo-stats update [--with-players] [--player-stats-limit <n>]
-  campo-stats pull [--url <cache.json url>]
-  campo-stats available
-  campo-stats competitions
-  campo-stats seasons --competition <name>
-  campo-stats teams --competition <name>
-  campo-stats matches --competition <name> [--season <name>] [--team <name>]
-  campo-stats players [--team <name>] [--name <name>]
-  campo-stats player-stats [--competition <name>] [--match <id>] [--player <name>] [--team <name>]
-  campo-stats lineups [--match <id>] [--team <name>]
-  campo-stats squad --competition <name> --team <name> [--season <name>]
-  campo-stats fantasy-points [--competition <name>] [--player <name>] [--match <id>]
-  campo-stats injuries
-  campo-stats identities [--status resolved|pending|rejected]
-  campo-stats identities propose --competition <name>
-  campo-stats identities confirm --id <identityId>
-  campo-stats identities reject --id <identityId>
-  campo-stats migrate [--db <path>]
+  campus sync --fantasy|--all [--with-players] [--player-stats-limit <n>]
+  campus sync --competition <name> [--source statsbomb|fbref] [--with-players] [--player-stats-limit <n>]
+  campus update [--with-players] [--player-stats-limit <n>]
+  campus pull [--url <cache.json url>]
+  campus available
+  campus competitions
+  campus seasons --competition <name>
+  campus teams --competition <name>
+  campus matches --competition <name> [--season <name>] [--team <name>]
+  campus players [--team <name>] [--name <name>]
+  campus player-stats [--competition <name>] [--match <id>] [--player <name>] [--team <name>]
+  campus lineups [--match <id>] [--team <name>]
+  campus squad --competition <name> --team <name> [--season <name>]
+  campus fantasy-points [--competition <name>] [--player <name>] [--match <id>]
+  campus injuries
+  campus identities [--status resolved|pending|rejected]
+  campus identities propose --competition <name>
+  campus identities confirm --id <identityId>
+  campus identities reject --id <identityId>
+  campus migrate [--db <path>]
 
 Options:
   --fantasy / --all          Sync all StatsBomb women's comps (clubs + national teams)
@@ -70,12 +70,12 @@ Options:
   --match <id>               Match id filter
   --status <status>          Filter identities list
   --id <identityId>          Identity id for confirm/reject
-  --sqlite                   Use SQLite store (default path .campo-stats/campo-stats.sqlite)
+  --sqlite                   Use SQLite store (default path .campus/campus.sqlite)
   --db <path>                SQLite database path (implies --sqlite)
   --json                     Force JSON cache (default)
   --help                     Show this help
 
-Periodic refresh: see docs/cron.md (GitLab CI schedule + campo-stats pull).
+Periodic refresh: see docs/cron.md (GitLab CI schedule + campus pull).
 `);
   process.exit(1);
 }
@@ -98,7 +98,7 @@ function includesCI(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
-function requireCompetition(cache: CampoCache, name: string) {
+function requireCompetition(cache: CampusCache, name: string) {
   const competition = cache.competitions.find((c) =>
     includesCI(c.name, name) || c.name.toLowerCase() === name.toLowerCase(),
   );
@@ -177,7 +177,7 @@ function printSyncSummary(
     players?: unknown[];
     playerMatchStats?: unknown[];
   },
-  cache: CampoCache,
+  cache: CampusCache,
 ): void {
   console.log(
     JSON.stringify(
@@ -234,10 +234,10 @@ async function cmdPull(args: string[]): Promise<void> {
   if (!res.ok) {
     throw new Error(
       `Failed to pull data bundle (${res.status}). ` +
-        `Ensure the GitLab CI cron has published campo-stats-data/latest (see docs/cron.md).`,
+        `Ensure the GitLab CI cron has published campus-data/latest (see docs/cron.md).`,
     );
   }
-  const remote = (await res.json()) as Partial<CampoCache>;
+  const remote = (await res.json()) as Partial<CampusCache>;
   const incoming = {
     ...emptyCache(),
     competitions: remote.competitions ?? [],
@@ -563,7 +563,7 @@ async function cmdIdentities(args: string[]): Promise<void> {
 async function cmdLineups(args: string[]): Promise<void> {
   const matchId = getFlag(args, "--match");
   const team = getFlag(args, "--team");
-  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const client = CampusClient.fromCache(await readStore(storeMode, dbPath));
   const playerById = new Map(client.data.players.map((p) => [p.id, p]));
   const teamById = new Map(client.data.teams.map((t) => [t.id, t]));
   console.log(
@@ -586,14 +586,14 @@ async function cmdSquad(args: string[]): Promise<void> {
   const team = getFlag(args, "--team");
   if (!competition || !team) usage();
   const season = getFlag(args, "--season");
-  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const client = CampusClient.fromCache(await readStore(storeMode, dbPath));
   console.log(
     JSON.stringify(client.squad({ competition, team, season }), null, 2),
   );
 }
 
 async function cmdFantasyPoints(args: string[]): Promise<void> {
-  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const client = CampusClient.fromCache(await readStore(storeMode, dbPath));
   const rows = client.fantasyPoints({
     competition: getFlag(args, "--competition"),
     matchId: getFlag(args, "--match"),
@@ -616,7 +616,7 @@ async function cmdFantasyPoints(args: string[]): Promise<void> {
 }
 
 async function cmdInjuries(): Promise<void> {
-  const client = CampoClient.fromCache(await readStore(storeMode, dbPath));
+  const client = CampusClient.fromCache(await readStore(storeMode, dbPath));
   console.log(
     JSON.stringify(
       {

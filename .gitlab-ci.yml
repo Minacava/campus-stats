@@ -1,4 +1,4 @@
-# Build and test campo-stats on every MR / push
+# Build and test campus on every MR / push
 image: node:22-bookworm
 
 stages:
@@ -47,8 +47,8 @@ publish_gitlab_package:
     # Also upload the tarball to the Generic Package Registry for direct download.
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file "campo-stats-${CI_COMMIT_TAG#v}.tgz" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campo-stats/${CI_COMMIT_TAG#v}/campo-stats-${CI_COMMIT_TAG#v}.tgz"
+        --upload-file "campus-${CI_COMMIT_TAG#v}.tgz" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campus/${CI_COMMIT_TAG#v}/campus-${CI_COMMIT_TAG#v}.tgz"
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
       when: on_success
@@ -64,11 +64,11 @@ refresh_fantasy_data:
     - npm ci
     - npm run build
     - node dist/cli.js sync --fantasy
-    - test -f .campo-stats/cache.json
+    - test -f .campus/cache.json
     - |
       node -e '
         const fs = require("fs");
-        const cache = JSON.parse(fs.readFileSync(".campo-stats/cache.json", "utf8"));
+        const cache = JSON.parse(fs.readFileSync(".campus/cache.json", "utf8"));
         const meta = {
           generatedAt: new Date().toISOString(),
           pipelineId: process.env.CI_PIPELINE_ID || null,
@@ -80,17 +80,17 @@ refresh_fantasy_data:
           players: cache.players?.length ?? 0,
           playerMatchStats: cache.playerMatchStats?.length ?? 0,
         };
-        fs.writeFileSync(".campo-stats/meta.json", JSON.stringify(meta, null, 2) + "\n");
+        fs.writeFileSync(".campus/meta.json", JSON.stringify(meta, null, 2) + "\n");
         console.log(JSON.stringify(meta, null, 2));
       '
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file ".campo-stats/cache.json" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campo-stats-data/latest/cache.json"
+        --upload-file ".campus/cache.json" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campus-data/latest/cache.json"
     - |
       curl --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file ".campo-stats/meta.json" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campo-stats-data/latest/meta.json"
+        --upload-file ".campus/meta.json" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/campus-data/latest/meta.json"
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"

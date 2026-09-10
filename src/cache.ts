@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type {
-  CampoCache,
+  CampusCache,
   Competition,
   InjuryRecord,
   LineupEntry,
@@ -11,10 +11,10 @@ import type {
 } from "./types.js";
 import type { SyncResult } from "./sources/types.js";
 
-export const DEFAULT_CACHE_DIR = ".campo-stats";
+export const DEFAULT_CACHE_DIR = ".campus";
 export const DEFAULT_CACHE_FILE = "cache.json";
 
-export function emptyCache(): CampoCache {
+export function emptyCache(): CampusCache {
   return {
     competitions: [],
     seasons: [],
@@ -32,10 +32,10 @@ export function cachePath(cwd: string = process.cwd()): string {
   return path.join(cwd, DEFAULT_CACHE_DIR, DEFAULT_CACHE_FILE);
 }
 
-export async function loadCache(filePath: string = cachePath()): Promise<CampoCache> {
+export async function loadCache(filePath: string = cachePath()): Promise<CampusCache> {
   try {
     const raw = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw) as Partial<CampoCache>;
+    const parsed = JSON.parse(raw) as Partial<CampusCache>;
     return {
       competitions: parsed.competitions ?? [],
       seasons: parsed.seasons ?? [],
@@ -55,7 +55,7 @@ export async function loadCache(filePath: string = cachePath()): Promise<CampoCa
 }
 
 export async function saveCache(
-  cache: CampoCache,
+  cache: CampusCache,
   filePath: string = cachePath(),
 ): Promise<void> {
   await mkdir(path.dirname(filePath), { recursive: true });
@@ -70,7 +70,7 @@ function mergeById<T extends { id: string }>(existing: T[], incoming: T[]): T[] 
 }
 
 /** Merge a sync result into the cache without wiping unrelated competitions. */
-export function mergeSyncResult(cache: CampoCache, result: SyncResult): CampoCache {
+export function mergeSyncResult(cache: CampusCache, result: SyncResult): CampusCache {
   return {
     competitions: mergeById<Competition>(cache.competitions, result.competitions),
     seasons: mergeById<Season>(cache.seasons, result.seasons),

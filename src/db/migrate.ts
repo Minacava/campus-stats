@@ -2,7 +2,7 @@ import { access } from "node:fs/promises";
 import { cachePath, loadCache } from "../cache.js";
 import { SqliteStore } from "./sqlite-store.js";
 
-export const DEFAULT_DB_PATH = ".campo-stats/campo-stats.sqlite";
+export const DEFAULT_DB_PATH = ".campus/campus.sqlite";
 
 /** Import JSON cache into SQLite (upsert). No-op if JSON cache missing. */
 export async function migrateJsonCacheToSqlite(

@@ -1,10 +1,10 @@
 # Injuries
 
-Fantasy apps often need availability. **campo-stats** exposes:
+Fantasy apps often need availability. **campus** exposes:
 
 - Type `InjuryRecord`
-- `listInjuries(cache)` / `CampoClient.injuries()`
-- CLI `campo-stats injuries`
+- `listInjuries(cache)` / `CampusClient.injuries()`
+- CLI `campus injuries`
 
 Today these always return an **empty** list because StatsBomb Open Data and the
 FBref schedule pilot do **not** publish injury feeds.

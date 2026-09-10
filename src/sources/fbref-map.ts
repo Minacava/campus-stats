@@ -16,7 +16,7 @@ export interface FbrefCompetitionMeta {
   seasonSlug?: string;
 }
 
-/** Map parsed FBref schedule rows into campo-stats canonical entities. */
+/** Map parsed FBref schedule rows into campus canonical entities. */
 export function mapFbrefScheduleToSyncResult(
   meta: FbrefCompetitionMeta,
   rows: FbrefScheduleRow[],

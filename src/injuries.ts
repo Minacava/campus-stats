@@ -6,16 +6,16 @@
  * today and plug a future adapter without changing call sites.
  */
 
-import type { CampoCache, InjuryRecord } from "./types.js";
+import type { CampusCache, InjuryRecord } from "./types.js";
 
 export const INJURIES_AVAILABLE = false;
 
 export const INJURIES_STATUS_MESSAGE =
   "Injury feeds are not available from current open sources (StatsBomb / FBref pilot). " +
-  "campo-stats exposes InjuryRecord + listInjuries() for future adapters; " +
+  "campus exposes InjuryRecord + listInjuries() for future adapters; " +
   "today the list is always empty.";
 
 /** Always empty until an injury-capable adapter is added. */
-export function listInjuries(cache: CampoCache): InjuryRecord[] {
+export function listInjuries(cache: CampusCache): InjuryRecord[] {
   return cache.injuries ?? [];
 }

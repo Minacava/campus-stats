@@ -1,23 +1,27 @@
 # Versioning
 
+## `0.3.0` (rename to campus)
+
+Breaking rename for brand alignment:
+
+- npm package + CLI: **`campus`** (was `campo-stats`)
+- `CampusClient` / `CampusCache` (was `CampoClient` / `CampoCache`)
+- Local store: `.campus/` (was `.campo-stats/`)
+- Data bundle: `campus-data/latest` (was `campo-stats-data/latest`)
+
+Install:
+
+```bash
+npm install campus \
+  --registry=https://gitlab.com/api/v4/projects/86296665/packages/npm/
+```
+
 ## `0.2.0` (app install focus)
 
-What this version guarantees:
-
 - Installable library + CLI via GitLab Package Registry
-- `CampoClient` for apps: `open`, `fromBundle`, `syncFantasy`, `update`, `pull`, queries
-- CLI: `sync --fantasy|--all`, `update`, `pull`, `available`, `lineups`, `squad`,
-  `fantasy-points`, `injuries`, plus prior query commands
-- Canonical schema including lineups; injuries type present (empty feed)
-- StatsBomb women's catalogue (clubs + national teams) and FBref schedule pilots
-- Cron-published data bundle (`campo-stats-data/latest`) via GitLab schedule
-
-What it does **not** guarantee yet:
-
-- Injury data from an open source
-- FBref player-level stats
-- Full-season player-stats sync without `--player-stats-limit`
-- Availability on the public npmjs registry (intentionally out of scope)
+- Client API: `open`, `fromBundle`, `syncFantasy`, `update`, `pull`, queries
+- CLI fantasy sync, lineups/squad, fantasy-points, injuries stub
+- Cron-published data bundle
 
 ## `0.1.0` (initial public release)
 
