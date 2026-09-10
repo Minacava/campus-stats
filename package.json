@@ -1,6 +1,6 @@
 {
   "name": "campus-stats",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Campus — installable women's football data layer for apps (clubs, national teams, matches, fantasy points)",
   "type": "module",
   "main": "./dist/index.js",
@@ -41,12 +41,11 @@
     "cli"
   ],
   "repository": {
-    "type": "git",
-    "url": "git+https://gitlab.com/marina34/campus-docs.git"
+    "url": "https://campus-tawny-mu.vercel.app/"
   },
   "homepage": "https://campus-tawny-mu.vercel.app/",
   "bugs": {
-    "url": "https://gitlab.com/marina34/campus-docs/-/issues"
+    "url": "https://campus-tawny-mu.vercel.app/"
   },
   "license": "MIT",
   "devDependencies": {
