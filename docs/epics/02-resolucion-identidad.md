@@ -19,7 +19,7 @@ Cada entidad ya lleva `sources[]` con provenance. Con dos fuentes, el mismo equi
 
 ## Tasks
 
-- [ ] Diseñar modelo: canonical ID, aliases, enlaces a `sources[]`, nivel de confianza
+- [x] Diseñar modelo: canonical ID, aliases, enlaces a `sources[]`, nivel de confianza
 - [ ] Implementar matching de equipos (nombre normalizado + competición/temporada)
 - [ ] Definir reglas: auto-merge vs candidato pendiente de revisión
 - [ ] Persistir resoluciones en caché (o tabla dedicada si ya hay SQLite)
