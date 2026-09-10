@@ -10,14 +10,28 @@
  * (`competition_gender === "female"`).
  */
 
-import { entityId } from "../ids.js";
-import type { Competition, Match, Player, PlayerMatchStats, Season, Team } from "../types.js";
+import type { LineupEntry, Match, Player, PlayerMatchStats } from "../types.js";
 import { aggregateStatsBombPlayerMatch } from "./statsbomb-player-stats.js";
 import type { FootballSource, SyncResult } from "./types.js";
+import { entityId } from "../ids.js";
+import type {
+  Competition,
+  Season,
+  Team,
+  TeamKind,
+} from "../types.js";
 
 const SOURCE = "statsbomb";
 const BASE =
   "https://raw.githubusercontent.com/statsbomb/open-data/master/data";
+
+export interface WomenCompetitionInfo {
+  id: number;
+  name: string;
+  country: string;
+  international: boolean;
+  seasons: Array<{ id: number; name: string }>;
+}
 
 interface SbCompetition {
   competition_id: number;
@@ -25,6 +39,7 @@ interface SbCompetition {
   country_name: string;
   competition_name: string;
   competition_gender: string;
+  competition_international?: boolean;
   season_name: string;
 }
 
@@ -84,6 +99,30 @@ export class StatsBombSource implements FootballSource {
     this.playerStatsLimit = options.playerStatsLimit ?? 5;
   }
 
+  /** Catalogue of women's competitions (clubs + national-team tournaments). */
+  async listWomenCompetitions(): Promise<WomenCompetitionInfo[]> {
+    const all = await this.fetchJson<SbCompetition[]>(
+      `${this.baseUrl}/competitions.json`,
+    );
+    const byId = new Map<number, WomenCompetitionInfo>();
+    for (const row of all) {
+      if (row.competition_gender !== "female") continue;
+      const existing = byId.get(row.competition_id);
+      if (!existing) {
+        byId.set(row.competition_id, {
+          id: row.competition_id,
+          name: row.competition_name,
+          country: row.country_name,
+          international: Boolean(row.competition_international),
+          seasons: [{ id: row.season_id, name: row.season_name }],
+        });
+      } else {
+        existing.seasons.push({ id: row.season_id, name: row.season_name });
+      }
+    }
+    return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   async syncCompetition(competitionName: string): Promise<SyncResult> {
     const all = await this.fetchJson<SbCompetition[]>(
       `${this.baseUrl}/competitions.json`,
@@ -115,11 +154,14 @@ export class StatsBombSource implements FootballSource {
 
     for (const row of rows) {
       const competitionId = entityId(SOURCE, "comp", row.competition_id);
+      const international = Boolean(row.competition_international);
+      const teamKind: TeamKind = international ? "national" : "club";
       competitions.set(competitionId, {
         id: competitionId,
         name: row.competition_name,
         country: row.country_name,
         gender: "female",
+        international,
         sources: [{ source: SOURCE, id: String(row.competition_id) }],
       });
 
@@ -153,12 +195,14 @@ export class StatsBombSource implements FootballSource {
           id: homeId,
           name: m.home_team.home_team_name,
           country: m.home_team.country?.name,
+          kind: teamKind,
           sources: [{ source: SOURCE, id: String(m.home_team.home_team_id) }],
         });
         teams.set(awayId, {
           id: awayId,
           name: m.away_team.away_team_name,
           country: m.away_team.country?.name,
+          kind: teamKind,
           sources: [{ source: SOURCE, id: String(m.away_team.away_team_id) }],
         });
 
@@ -189,17 +233,23 @@ export class StatsBombSource implements FootballSource {
       );
       result.players = enriched.players;
       result.playerMatchStats = enriched.playerMatchStats;
+      result.lineups = enriched.lineups;
     }
 
     return result;
   }
 
-  /** Load aggregated v1 player stats for the given canonical matches. */
+  /** Load aggregated v1 player stats + lineups for the given canonical matches. */
   async loadPlayerStatsForMatches(
     matches: Match[],
-  ): Promise<{ players: Player[]; playerMatchStats: PlayerMatchStats[] }> {
+  ): Promise<{
+    players: Player[];
+    playerMatchStats: PlayerMatchStats[];
+    lineups: LineupEntry[];
+  }> {
     const players = new Map<string, Player>();
     const playerMatchStats: PlayerMatchStats[] = [];
+    const lineupEntries: LineupEntry[] = [];
 
     for (const match of matches) {
       const nativeId = match.sources.find((s) => s.source === SOURCE)?.id;
@@ -212,6 +262,7 @@ export class StatsBombSource implements FootballSource {
             player_id: number;
             player_name: string;
             player_nickname?: string | null;
+            jersey_number?: number | null;
             country?: { name?: string };
             cards?: Array<{ card_type?: string }>;
             positions?: Array<{ from?: string | null; to?: string | null }>;
@@ -231,8 +282,13 @@ export class StatsBombSource implements FootballSource {
       const agg = aggregateStatsBombPlayerMatch(match.id, lineups, events);
       for (const p of agg.players) players.set(p.id, p);
       playerMatchStats.push(...agg.playerMatchStats);
+      lineupEntries.push(...agg.lineups);
     }
 
-    return { players: [...players.values()], playerMatchStats };
+    return {
+      players: [...players.values()],
+      playerMatchStats,
+      lineups: lineupEntries,
+    };
   }
 }
