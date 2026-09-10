@@ -16,24 +16,31 @@ function usage(): never {
   console.error(`campo-stats — women's football data CLI
 
 Usage:
-  campo-stats sync --competition <name> [--source statsbomb|fbref]
+  campo-stats sync --competition <name> [--source statsbomb|fbref] [--with-players] [--player-stats-limit <n>]
   campo-stats competitions
   campo-stats seasons --competition <name>
   campo-stats teams --competition <name>
   campo-stats matches --competition <name> [--season <name>] [--team <name>]
+  campo-stats players [--team <name>] [--name <name>]
+  campo-stats player-stats [--competition <name>] [--match <id>] [--player <name>] [--team <name>]
   campo-stats identities [--status resolved|pending|rejected]
   campo-stats identities propose --competition <name>
   campo-stats identities confirm --id <identityId>
   campo-stats identities reject --id <identityId>
 
 Options:
-  --competition <name>  Competition display name (e.g. "Liga F")
-  --source <id>         Data source for sync (default: statsbomb)
-  --season <name>       Season label (e.g. "2023/2024")
-  --team <name>         Team name substring (case-insensitive)
-  --status <status>     Filter identities list
-  --id <identityId>     Identity id for confirm/reject
-  --help                Show this help
+  --competition <name>       Competition display name (e.g. "Liga F")
+  --source <id>              Data source for sync (default: statsbomb)
+  --with-players             StatsBomb only: also sync v1 player match stats
+  --player-stats-limit <n>   Max matches to enrich (default 5)
+  --season <name>            Season label (e.g. "2023/2024")
+  --team <name>              Team name substring (case-insensitive)
+  --player <name>            Player name substring
+  --name <name>              Player name substring (players command)
+  --match <id>               Match id filter
+  --status <status>          Filter identities list
+  --id <identityId>          Identity id for confirm/reject
+  --help                     Show this help
 `);
   process.exit(1);
 }
@@ -46,6 +53,10 @@ function getFlag(args: string[], name: string): string | undefined {
     throw new Error(`Missing value for ${name}`);
   }
   return value;
+}
+
+function hasFlag(args: string[], name: string): boolean {
+  return args.includes(name);
 }
 
 function includesCI(haystack: string, needle: string): boolean {
@@ -72,11 +83,22 @@ async function cmdSync(args: string[]): Promise<void> {
   const competition = getFlag(args, "--competition");
   if (!competition) usage();
   const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
+  const withPlayers = hasFlag(args, "--with-players");
+  const limitRaw = getFlag(args, "--player-stats-limit");
+  const playerStatsLimit = limitRaw ? Number(limitRaw) : 5;
 
   let source: FootballSource;
   if (sourceId === "statsbomb") {
-    source = new StatsBombSource();
+    source = new StatsBombSource({
+      includePlayerStats: withPlayers,
+      playerStatsLimit,
+    });
   } else if (sourceId === "fbref") {
+    if (withPlayers) {
+      throw new Error(
+        "FBref player stats are not available yet (see docs/fbref-player-stats-deferred.md).",
+      );
+    }
     source = new FbrefSource();
   } else {
     throw new Error(`Unknown source: "${sourceId}". Use statsbomb or fbref.`);
@@ -96,11 +118,15 @@ async function cmdSync(args: string[]): Promise<void> {
         seasons: result.seasons.length,
         teams: result.teams.length,
         matches: result.matches.length,
+        players: result.players?.length ?? 0,
+        playerMatchStats: result.playerMatchStats?.length ?? 0,
         totals: {
           competitions: cache.competitions.length,
           seasons: cache.seasons.length,
           teams: cache.teams.length,
           matches: cache.matches.length,
+          players: cache.players.length,
+          playerMatchStats: cache.playerMatchStats.length,
         },
       },
       null,
@@ -224,6 +250,97 @@ async function cmdMatches(args: string[]): Promise<void> {
   );
 }
 
+async function cmdPlayers(args: string[]): Promise<void> {
+  const teamName = getFlag(args, "--team");
+  const name = getFlag(args, "--name");
+  const cache = await loadCache();
+  const teamById = new Map(cache.teams.map((t) => [t.id, t]));
+  const teamIds = teamName
+    ? new Set(
+        cache.teams
+          .filter((t) => includesCI(t.name, teamName))
+          .map((t) => t.id),
+      )
+    : null;
+
+  let players = cache.players;
+  if (name) players = players.filter((p) => includesCI(p.name, name));
+  if (teamIds) {
+    const playerIds = new Set(
+      cache.playerMatchStats
+        .filter((s) => teamIds.has(s.teamId))
+        .map((s) => s.playerId),
+    );
+    players = players.filter((p) => playerIds.has(p.id));
+  }
+
+  console.log(
+    JSON.stringify(
+      players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        nickname: p.nickname,
+        country: p.country,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdPlayerStats(args: string[]): Promise<void> {
+  const competitionName = getFlag(args, "--competition");
+  const matchId = getFlag(args, "--match");
+  const playerName = getFlag(args, "--player");
+  const teamName = getFlag(args, "--team");
+  const cache = await loadCache();
+
+  let competitionId: string | undefined;
+  if (competitionName) {
+    competitionId = requireCompetition(cache, competitionName).id;
+  }
+
+  const matchIds = new Set(
+    cache.matches
+      .filter((m) => (competitionId ? m.competitionId === competitionId : true))
+      .filter((m) => (matchId ? m.id === matchId || m.id.endsWith(`:${matchId}`) : true))
+      .map((m) => m.id),
+  );
+
+  const playerById = new Map(cache.players.map((p) => [p.id, p]));
+  const teamById = new Map(cache.teams.map((t) => [t.id, t]));
+
+  const rows = cache.playerMatchStats.filter((s) => {
+    if (!matchIds.has(s.matchId)) return false;
+    if (playerName) {
+      const n = playerById.get(s.playerId)?.name ?? "";
+      if (!includesCI(n, playerName)) return false;
+    }
+    if (teamName) {
+      const n = teamById.get(s.teamId)?.name ?? "";
+      if (!includesCI(n, teamName)) return false;
+    }
+    return true;
+  });
+
+  console.log(
+    JSON.stringify(
+      rows.map((s) => ({
+        matchId: s.matchId,
+        player: playerById.get(s.playerId)?.name,
+        team: teamById.get(s.teamId)?.name,
+        minutes: s.minutes,
+        goals: s.goals,
+        assists: s.assists,
+        yellowCards: s.yellowCards,
+        redCards: s.redCards,
+      })),
+      null,
+      2,
+    ),
+  );
+}
+
 async function cmdIdentities(args: string[]): Promise<void> {
   const sub = args[0];
   if (sub === "propose") {
@@ -287,6 +404,12 @@ async function main(): Promise<void> {
       break;
     case "matches":
       await cmdMatches(args);
+      break;
+    case "players":
+      await cmdPlayers(args);
+      break;
+    case "player-stats":
+      await cmdPlayerStats(args);
       break;
     case "identities":
       await cmdIdentities(args);
