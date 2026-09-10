@@ -59,8 +59,8 @@ SQLite.
 
 ## Estado actual
 
-Epic 00 (fundación v0) implementado: esquema, StatsBomb, caché JSON, CLI,
-tests offline y docs de contribución. Siguiente: Epic 01 (FBref).
+Epics 00–01 implementados: fundación StatsBomb + adapter FBref (pilotos WSL/Liga F,
+CLI `--source`, merge en caché). Siguiente: Epic 02 (identidad cross-source).
 
 ## Data source & terms
 
