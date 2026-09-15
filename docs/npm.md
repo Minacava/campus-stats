@@ -40,8 +40,8 @@ The package `name` in `package.json` must stay **`campus-stats`** (unscoped).
 The product brand remains **Campus**; CLI bins are `campus` and `campus-stats`.
 Public links on the npm page:
 
-- `repository` / `bugs`: https://github.com/Minacava/campus-stats
-- `homepage`: https://campus-tawny-mu.vercel.app/
+- `repository` / `bugs` / `homepage`: https://github.com/Minacava/campus-stats
+  (docs live in the GitHub README; no separate docs site)
 
 ## Local dry-run
 

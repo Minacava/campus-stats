@@ -1,6 +1,6 @@
 {
   "name": "campus-stats",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Campus — installable women's football data layer for apps (clubs, national teams, matches, fantasy points)",
   "type": "module",
   "main": "./dist/index.js",
@@ -44,7 +44,7 @@
     "type": "git",
     "url": "git+https://github.com/Minacava/campus-stats.git"
   },
-  "homepage": "https://campus-tawny-mu.vercel.app/",
+  "homepage": "https://github.com/Minacava/campus-stats#readme",
   "bugs": {
     "url": "https://github.com/Minacava/campus-stats/issues"
   },

@@ -1,5 +1,11 @@
 # Versioning
 
+## `0.4.5` (docs only on GitHub README)
+
+- Remove Vercel / `campus-docs` from npm metadata and README
+- `homepage` → https://github.com/Minacava/campus-stats#readme
+- Public documentation lives only in this repository’s README
+
 ## `0.4.3` (Vercel for homepage + repository)
 
 - `homepage` and `repository` → https://campus-tawny-mu.vercel.app/
