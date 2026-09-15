@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.4.5
+
+- Drop Vercel / `campus-docs` links from npm metadata and README
+- `homepage` → https://github.com/Minacava/campus-stats#readme
+  (docs live only in this repo’s README)
+
 ## 0.4.4
 
 - npm `repository` / `bugs` → https://github.com/Minacava/campus-stats

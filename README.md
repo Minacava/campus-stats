@@ -25,7 +25,7 @@ npx campus matches --competition "Liga F" --team "Barcelona"
 
 The CLI binaries are `campus` and `campus-stats` (same entrypoint).
 
-Docs: https://campus-tawny-mu.vercel.app/  
+Documentation lives in this README.  
 Source: https://github.com/Minacava/campus-stats
 
 ---
@@ -119,8 +119,8 @@ Injuries are **not** in these open feeds yet — the API is ready, the list is e
 
 ## Docs & source
 
-- Docs: https://campus-tawny-mu.vercel.app/
-- Source: https://github.com/Minacava/campus-stats
+All public docs are in this README on GitHub:
+https://github.com/Minacava/campus-stats
 
 ---
 
