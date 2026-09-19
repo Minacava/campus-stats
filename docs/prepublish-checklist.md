@@ -9,7 +9,7 @@
 - [x] Package name is unscoped **`campus-stats`** (free on npmjs)
 - [x] CLI bins: `campus` and `campus-stats`
 - [x] CI publishes to **npmjs** on `vX.Y.Z` tags (GitHub Actions `publish.yml`)
-- [ ] GitHub Actions secret `NPM_TOKEN` set
-- [ ] Tag `vX.Y.Z` pushed on `main` after merge
+- [x] GitHub Actions secret `NPM_TOKEN` set
+- [ ] Tag `v0.5.0` pushed on `main` to publish
 
 See [`docs/npm.md`](./npm.md).

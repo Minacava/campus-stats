@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0
+
 - **CI / data host:** GitLab → **GitHub Actions**
   - `ci.yml` (test), `publish.yml` (npmjs on `v*` tags), `refresh-data.yml`
     (daily fantasy sync → Release `data-latest`)

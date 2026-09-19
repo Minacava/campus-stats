@@ -1,6 +1,6 @@
 # Versioning
 
-## Unreleased (GitHub-only CI + data bundle)
+## `0.5.0` (GitHub-only CI + data bundle)
 
 - CI moved from GitLab to **GitHub Actions** (`ci.yml`, `publish.yml`,
   `refresh-data.yml`)

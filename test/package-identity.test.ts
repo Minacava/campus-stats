@@ -23,7 +23,7 @@ describe("campus-stats package identity", () => {
       repository?: { type?: string; url?: string };
     };
     assert.equal(pkg.name, "campus-stats");
-    assert.ok(pkg.version.startsWith("0.4"));
+    assert.ok(pkg.version.startsWith("0."));
     assert.equal(pkg.bin.campus, "./dist/cli.js");
     assert.equal(pkg.bin["campus-stats"], "./dist/cli.js");
     assert.equal(pkg.bin["campo-stats"], undefined);
