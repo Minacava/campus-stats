@@ -1,0 +1,62 @@
+name: Refresh fantasy data
+
+on:
+  schedule:
+    # Daily 06:00 UTC (same cadence as the former GitLab pipeline schedule)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Sync fantasy bundle
+        run: node dist/cli.js sync --fantasy
+      - name: Write meta.json
+        run: |
+          node -e '
+            const fs = require("fs");
+            const cache = JSON.parse(fs.readFileSync(".campus/cache.json", "utf8"));
+            const meta = {
+              generatedAt: new Date().toISOString(),
+              runId: process.env.GITHUB_RUN_ID || null,
+              commitSha: process.env.GITHUB_SHA || null,
+              competitions: cache.competitions?.length ?? 0,
+              seasons: cache.seasons?.length ?? 0,
+              teams: cache.teams?.length ?? 0,
+              matches: cache.matches?.length ?? 0,
+              players: cache.players?.length ?? 0,
+              playerMatchStats: cache.playerMatchStats?.length ?? 0,
+            };
+            fs.writeFileSync(".campus/meta.json", JSON.stringify(meta, null, 2) + "\n");
+            console.log(JSON.stringify(meta, null, 2));
+          '
+      - name: Publish data-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=data-latest
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" \
+              .campus/cache.json \
+              .campus/meta.json \
+              --clobber
+          else
+            gh release create "$TAG" \
+              .campus/cache.json \
+              .campus/meta.json \
+              --title "Campus data bundle (latest)" \
+              --notes "Rolling women's fantasy cache refreshed by GitHub Actions. See docs/cron.md." \
+              --latest=false
+          fi

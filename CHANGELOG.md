@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **CI / data host:** GitLab → **GitHub Actions**
+  - `ci.yml` (test), `publish.yml` (npmjs on `v*` tags), `refresh-data.yml`
+    (daily fantasy sync → Release `data-latest`)
+  - Removed `.gitlab-ci.yml` and GitLab Package Registry mirror docs
+- **Breaking (public API):** removed export `GITLAB_PROJECT_ID`;
+  `dataBundleUrl()` / `dataBundleMetaUrl()` now point at
+  `https://github.com/Minacava/campus-stats/releases/download/data-latest/…`
+- Docs (`cron.md`, `npm.md`, README) updated for GitHub
+
 ## 0.4.5
 
 - Drop Vercel / `campus-docs` links from npm metadata and README

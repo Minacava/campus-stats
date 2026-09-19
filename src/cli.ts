@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 import { cachePath, emptyCache, mergeSyncResult } from "./cache.js";
-import {
-  dataBundleUrl,
-  GITLAB_PROJECT_ID,
-} from "./data-bundle.js";
+import { dataBundleUrl } from "./data-bundle.js";
 import {
   readStore,
   resolveDbPath,
@@ -75,7 +72,7 @@ Options:
   --json                     Force JSON cache (default)
   --help                     Show this help
 
-Periodic refresh: see docs/cron.md (GitLab CI schedule + campus pull).
+Periodic refresh: see docs/cron.md (GitHub Actions schedule + campus pull).
 `);
   process.exit(1);
 }
@@ -228,13 +225,13 @@ async function cmdUpdate(args: string[]): Promise<void> {
 }
 
 async function cmdPull(args: string[]): Promise<void> {
-  const url = getFlag(args, "--url") ?? dataBundleUrl(GITLAB_PROJECT_ID);
+  const url = getFlag(args, "--url") ?? dataBundleUrl();
   console.error(`Pulling data bundle from ${url}…`);
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(
       `Failed to pull data bundle (${res.status}). ` +
-        `Ensure the GitLab CI cron has published campus-data/latest (see docs/cron.md).`,
+        `Ensure the GitHub Actions cron has published the data-latest release (see docs/cron.md).`,
     );
   }
   const remote = (await res.json()) as Partial<CampusCache>;
