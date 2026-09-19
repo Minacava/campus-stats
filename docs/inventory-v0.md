@@ -1,7 +1,7 @@
 # Inventory v0 — repository status
 
 Date: 2026-09-10  
-Project: Campus / `campus` (`marina34/campus`)
+Project: Campus / `campus-stats` (`Minacava/campus-stats` on GitHub)
 
 ## What exists today
 

@@ -4,29 +4,28 @@
 produced on a **schedule** and published as a JSON cache snapshot consumers can
 `pull`.
 
-## GitLab CI schedule (recommended)
+## GitHub Actions schedule (recommended)
 
-1. Open **Build → Pipeline schedules** in
-   [marina34/campus](https://gitlab.com/marina34/campus/-/pipeline_schedules).
-2. Create a schedule on branch `main`, for example:
-   - **Interval (cron):** `0 6 * * *` (every day at 06:00 UTC)
-   - **Target:** `main`
-   - **Active:** yes
-3. The scheduled pipeline runs `refresh_fantasy_data`, which:
+1. Open **Actions → Refresh fantasy data** in
+   [Minacava/campus-stats](https://github.com/Minacava/campus-stats/actions/workflows/refresh-data.yml).
+2. The workflow runs on a schedule (`0 6 * * *`, every day at 06:00 UTC) and can
+   also be started manually (**Run workflow**).
+3. Each run:
    - builds the CLI
    - runs `campus sync --fantasy`
-   - uploads `.campus/cache.json` (+ `meta.json`) to the Generic Package
-     Registry as `campus-data/latest/`
+   - uploads `.campus/cache.json` (+ `meta.json`) to the rolling GitHub Release
+     tag **`data-latest`**
 
-You can also trigger the same job manually (**Build → Pipelines → Run pipeline**
-with source `web`; the job is `manual` for web pipelines).
+Default download URL:
+
+`https://github.com/Minacava/campus-stats/releases/download/data-latest/cache.json`
 
 ## Consumer: pull the refreshed bundle
 
 ```bash
 npx campus pull
 # or
-npx campus pull --url https://gitlab.com/api/v4/projects/86296665/packages/generic/campus-data/latest/cache.json
+npx campus pull --url https://github.com/Minacava/campus-stats/releases/download/data-latest/cache.json
 ```
 
 This writes/merges into the local `.campus/cache.json` (or `--sqlite`).

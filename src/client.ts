@@ -11,7 +11,7 @@ import {
   saveCache,
   cachePath,
 } from "./cache.js";
-import { dataBundleUrl, GITLAB_PROJECT_ID } from "./data-bundle.js";
+import { dataBundleUrl } from "./data-bundle.js";
 import {
   syncFantasyBundle,
   updateCachedCompetitions,
@@ -73,12 +73,12 @@ export class CampusClient {
     mergeWith?: CampusCache;
     persistPath?: string;
   } = {}): Promise<CampusClient> {
-    const url = options.url ?? dataBundleUrl(GITLAB_PROJECT_ID);
+    const url = options.url ?? dataBundleUrl();
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(
         `Failed to load data bundle (${res.status}) from ${url}. ` +
-          "Publish via GitLab CI schedule (docs/cron.md) or call syncFantasy() once.",
+          "Publish via GitHub Actions schedule (docs/cron.md) or call syncFantasy() once.",
       );
     }
     const remote = (await res.json()) as Partial<CampusCache>;

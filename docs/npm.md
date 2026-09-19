@@ -15,12 +15,11 @@ Package page: https://www.npmjs.com/package/campus-stats
    the `campus-stats` package.
 2. Create an **Automation** access token (or granular publish token) with
    permission to publish `campus-stats`.
-3. In GitLab → **Settings → CI/CD → Variables**, add:
-   - Key: `NPM_TOKEN`
+3. In GitHub → **Settings → Secrets and variables → Actions**, add:
+   - Name: `NPM_TOKEN`
    - Value: the npm token
-   - Flags: **Masked**, **Protected** (and available to protected tags)
-4. Protect the `v*` tags (or the release workflow you use) so protected
-   variables are available on tag pipelines.
+4. Prefer protecting `v*` tags (or restricting who can create release tags) so
+   only trusted pushes trigger publish.
 
 ## How a version is released
 
@@ -31,10 +30,9 @@ git tag v0.4.1
 git push origin v0.4.1
 ```
 
-CI runs `test`, then:
+GitHub Actions runs the **Publish npm** workflow:
 
-- `publish_npmjs` → `npm publish --access public` to registry.npmjs.org
-- `publish_gitlab_package` → mirror to this project's Package Registry
+- `npm ci` → build → `npm publish --access public` to registry.npmjs.org
 
 The package `name` in `package.json` must stay **`campus-stats`** (unscoped).
 The product brand remains **Campus**; CLI bins are `campus` and `campus-stats`.
@@ -49,7 +47,3 @@ Public links on the npm page:
 npm pack
 npm publish --dry-run
 ```
-
-## Checklist
-
-See [`docs/prepublish-checklist.md`](./prepublish-checklist.md).

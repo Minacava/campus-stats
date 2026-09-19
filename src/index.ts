@@ -40,10 +40,11 @@ export {
 } from "./fantasy.js";
 export type { FantasySyncOptions } from "./fantasy.js";
 export {
-  GITLAB_PROJECT_ID,
-  DATA_BUNDLE_PACKAGE,
-  DATA_BUNDLE_VERSION,
+  DATA_BUNDLE_OWNER,
+  DATA_BUNDLE_REPO,
+  DATA_BUNDLE_RELEASE_TAG,
   DATA_BUNDLE_FILE,
+  DATA_BUNDLE_META_FILE,
   dataBundleUrl,
   dataBundleMetaUrl,
 } from "./data-bundle.js";

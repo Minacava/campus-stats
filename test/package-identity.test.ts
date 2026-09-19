@@ -37,6 +37,9 @@ describe("campus-stats package identity", () => {
     assert.match(cachePath("/tmp/app"), /\/\.campus\/cache\.json$/);
     assert.equal(typeof CampusClient.open, "function");
     assert.equal(typeof CampusClient.fromBundle, "function");
-    assert.match(dataBundleUrl(), /\/campus-data\/latest\/cache\.json$/);
+    assert.match(
+      dataBundleUrl(),
+      /github\.com\/Minacava\/campus-stats\/releases\/download\/data-latest\/cache\.json$/,
+    );
   });
 });

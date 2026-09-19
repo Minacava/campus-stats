@@ -59,10 +59,10 @@ describe("fantasy product helpers", () => {
     assert.ok(updated.matches.length >= first.matches.length);
   });
 
-  it("dataBundleUrl points at the cron-published generic package", () => {
+  it("dataBundleUrl points at the cron-published GitHub Release", () => {
     assert.match(
       dataBundleUrl(),
-      /packages\/generic\/campus-data\/latest\/cache\.json$/,
+      /github\.com\/Minacava\/campus-stats\/releases\/download\/data-latest\/cache\.json$/,
     );
   });
 });

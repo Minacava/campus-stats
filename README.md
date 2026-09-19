@@ -63,8 +63,9 @@ return Response.json({ clubs, nations, matches, squad, points });
 
 ## Keep data fresh (cron)
 
-1. GitLab **Pipeline schedule** on `main` (e.g. `0 6 * * *`) runs
-   `refresh_fantasy_data` and publishes `campus-data/latest/cache.json`.
+1. GitHub Actions schedule on `main` (e.g. `0 6 * * *`) runs
+   **Refresh fantasy data** and publishes the `data-latest` release
+   (`cache.json`).
 2. Apps call `CampusClient.fromBundle()` or `npx campus pull`.
 
 Details: [`docs/cron.md`](./docs/cron.md).
