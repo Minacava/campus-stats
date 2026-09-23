@@ -1,6 +1,6 @@
 {
   "name": "campus-stats",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Campus — installable women's football data layer for apps (clubs, national teams, matches, fantasy points)",
   "type": "module",
   "main": "./dist/index.js",

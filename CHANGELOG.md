@@ -2,13 +2,14 @@
 
 ## Unreleased
 
-- **Remove injuries** from CLI, library, cache, and SQLite (no StatsBomb endpoint).
+## 0.6.0
+
+- **Remove injuries** from CLI, library, cache, and SQLite (not in StatsBomb API).
 - **BYOK:** free Open Data by default; optional StatsBomb customer login
-  (`SB_USERNAME` / `SB_PASSWORD`) → paid API
+  (`SB_USERNAME` / `SB_PASSWORD`) → paid API at `data.statsbombservices.com`
 - **Paid extras:** `campus endpoints` + flags (`--with-paid-player-season-stats`, …)
-  that call the StatsBomb paid API when licensed
-- **README:** public-facing docs — Campus organizes data; free path already
-  connected; optional bring-your-own StatsBomb licence with clear examples
+- **README:** Campus organizes data — free path already connected; bring-your-own
+  StatsBomb licence with clear examples
 
 ## 0.5.0
 
