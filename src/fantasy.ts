@@ -161,7 +161,6 @@ function emptySyncResult(): SyncResult {
     players: [],
     playerMatchStats: [],
     lineups: [],
-    injuries: [],
   };
 }
 
@@ -172,14 +171,12 @@ function mergeSyncResults(a: SyncResult, b: SyncResult): SyncResult {
       players: a.players ?? [],
       playerMatchStats: a.playerMatchStats ?? [],
       lineups: a.lineups ?? [],
-      injuries: a.injuries ?? [],
     }),
     {
       ...b,
       players: b.players ?? [],
       playerMatchStats: b.playerMatchStats ?? [],
       lineups: b.lineups ?? [],
-      injuries: b.injuries ?? [],
     },
   );
   return {
@@ -190,7 +187,6 @@ function mergeSyncResults(a: SyncResult, b: SyncResult): SyncResult {
     players: cache.players,
     playerMatchStats: cache.playerMatchStats,
     lineups: cache.lineups,
-    injuries: cache.injuries,
   };
 }
 

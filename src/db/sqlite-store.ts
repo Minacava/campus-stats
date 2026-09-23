@@ -3,7 +3,6 @@ import type { CampusCache } from "../types.js";
 import type { CanonicalIdentity } from "../identity/types.js";
 import type {
   Competition,
-  InjuryRecord,
   LineupEntry,
   Match,
   Player,
@@ -84,16 +83,6 @@ CREATE TABLE IF NOT EXISTS lineups (
   jersey_number INTEGER,
   sources_json TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS injuries (
-  id TEXT PRIMARY KEY,
-  player_id TEXT NOT NULL,
-  team_id TEXT,
-  status TEXT NOT NULL,
-  description TEXT,
-  from_date TEXT,
-  to_date TEXT,
-  sources_json TEXT NOT NULL
-);
 `;
 
 function j(value: unknown): string {
@@ -130,7 +119,6 @@ export class SqliteStore {
         "players",
         "player_match_stats",
         "lineups",
-        "injuries",
       ]) {
         this.db.prepare(`DELETE FROM ${table}`).run();
       }
@@ -259,21 +247,6 @@ export class SqliteStore {
         sources: parseJson(String(row.sources_json)),
       })) satisfies LineupEntry[];
 
-    const injuries = this.db
-      .prepare("SELECT * FROM injuries")
-      .all()
-      .map((row) => ({
-        id: String(row.id),
-        playerId: String(row.player_id),
-        teamId: row.team_id == null ? undefined : String(row.team_id),
-        status: String(row.status) as InjuryRecord["status"],
-        description:
-          row.description == null ? undefined : String(row.description),
-        fromDate: row.from_date == null ? undefined : String(row.from_date),
-        toDate: row.to_date == null ? undefined : String(row.to_date),
-        sources: parseJson(String(row.sources_json)),
-      })) satisfies InjuryRecord[];
-
     return {
       competitions,
       seasons,
@@ -283,7 +256,6 @@ export class SqliteStore {
       players,
       playerMatchStats,
       lineups,
-      injuries,
     };
   }
 
@@ -428,29 +400,6 @@ export class SqliteStore {
         l.started ? 1 : 0,
         l.jerseyNumber ?? null,
         j(l.sources),
-      );
-    }
-
-    const upsertInjury = this.db.prepare(
-      `INSERT INTO injuries (
-         id, player_id, team_id, status, description, from_date, to_date, sources_json
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET
-         player_id=excluded.player_id, team_id=excluded.team_id,
-         status=excluded.status, description=excluded.description,
-         from_date=excluded.from_date, to_date=excluded.to_date,
-         sources_json=excluded.sources_json`,
-    );
-    for (const i of cache.injuries) {
-      upsertInjury.run(
-        i.id,
-        i.playerId,
-        i.teamId ?? null,
-        i.status,
-        i.description ?? null,
-        i.fromDate ?? null,
-        i.toDate ?? null,
-        j(i.sources),
       );
     }
   }

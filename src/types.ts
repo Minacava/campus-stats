@@ -95,22 +95,6 @@ export interface LineupEntry {
   sources: SourceRef[];
 }
 
-/**
- * Injury / availability record.
- * Open StatsBomb data does not include injuries — this shape is reserved for
- * future adapters; the CLI currently returns an empty list.
- */
-export interface InjuryRecord {
-  id: string;
-  playerId: string;
-  teamId?: string;
-  status: "injured" | "doubtful" | "suspended" | "unknown";
-  description?: string;
-  fromDate?: string;
-  toDate?: string;
-  sources: SourceRef[];
-}
-
 /** In-memory / on-disk cache shape (JSON file in v0). */
 export interface CampusCache {
   competitions: Competition[];
@@ -122,5 +106,4 @@ export interface CampusCache {
   players: Player[];
   playerMatchStats: PlayerMatchStats[];
   lineups: LineupEntry[];
-  injuries: InjuryRecord[];
 }

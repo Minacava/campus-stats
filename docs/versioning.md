@@ -57,7 +57,7 @@ Breaking rename for brand alignment:
 
 - Installable library + CLI
 - Client API: `open`, `fromBundle`, `syncFantasy`, `update`, `pull`, queries
-- CLI fantasy sync, lineups/squad, fantasy-points, injuries stub
+- CLI fantasy sync, lineups/squad, fantasy-points
 - Cron-published data bundle
 
 ## `0.1.0` (initial public release)
