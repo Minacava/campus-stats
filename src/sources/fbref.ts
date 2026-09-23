@@ -6,6 +6,9 @@
  * polite HttpClient defaults. This environment often receives Cloudflare
  * 403s; use fixtures / --fixture for offline sync.
  *
+ * Sports Reference does not offer a public FBref API key — Campus has no
+ * paid-key path for this source (see docs/byok.md).
+ *
  * See docs/fbref-pilot.md for competition ids and HTML shape.
  */
 

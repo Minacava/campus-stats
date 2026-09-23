@@ -3,7 +3,6 @@ import path from "node:path";
 import type {
   CampusCache,
   Competition,
-  InjuryRecord,
   LineupEntry,
   Match,
   Season,
@@ -24,7 +23,6 @@ export function emptyCache(): CampusCache {
     players: [],
     playerMatchStats: [],
     lineups: [],
-    injuries: [],
   };
 }
 
@@ -45,7 +43,6 @@ export async function loadCache(filePath: string = cachePath()): Promise<CampusC
       players: parsed.players ?? [],
       playerMatchStats: parsed.playerMatchStats ?? [],
       lineups: parsed.lineups ?? [],
-      injuries: parsed.injuries ?? [],
     };
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
@@ -83,6 +80,5 @@ export function mergeSyncResult(cache: CampusCache, result: SyncResult): CampusC
       result.playerMatchStats ?? [],
     ),
     lineups: mergeById<LineupEntry>(cache.lineups, result.lineups ?? []),
-    injuries: mergeById<InjuryRecord>(cache.injuries, result.injuries ?? []),
   };
 }

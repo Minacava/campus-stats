@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 import { cachePath, emptyCache, mergeSyncResult } from "./cache.js";
+import {
+  describeCredentials,
+  resolveCredentials,
+} from "./credentials.js";
 import { dataBundleUrl } from "./data-bundle.js";
 import {
   readStore,
@@ -17,12 +21,14 @@ import {
   updateCachedCompetitions,
 } from "./fantasy.js";
 import { CampusClient } from "./client.js";
-import { INJURIES_STATUS_MESSAGE } from "./injuries.js";
 import { proposeIdentitiesForCompetition } from "./identity/propose.js";
 import { setIdentityStatus } from "./identity/store.js";
-import { FbrefSource } from "./sources/fbref.js";
+import { createFootballSource, KNOWN_SOURCE_IDS } from "./sources/create.js";
+import {
+  listStatsBombEndpoints,
+  type StatsBombPaidExtras,
+} from "./sources/statsbomb-endpoints.js";
 import { StatsBombSource } from "./sources/statsbomb.js";
-import type { FootballSource } from "./sources/types.js";
 import type { CampusCache } from "./types.js";
 
 let storeMode: StoreMode = "json";
@@ -37,6 +43,8 @@ Usage:
   campus update [--with-players] [--player-stats-limit <n>]
   campus pull [--url <cache.json url>]
   campus available
+  campus credentials
+  campus endpoints
   campus competitions
   campus seasons --competition <name>
   campus teams --competition <name>
@@ -46,7 +54,6 @@ Usage:
   campus lineups [--match <id>] [--team <name>]
   campus squad --competition <name> --team <name> [--season <name>]
   campus fantasy-points [--competition <name>] [--player <name>] [--match <id>]
-  campus injuries
   campus identities [--status resolved|pending|rejected]
   campus identities propose --competition <name>
   campus identities confirm --id <identityId>
@@ -56,8 +63,15 @@ Usage:
 Options:
   --fantasy / --all          Sync all StatsBomb women's comps (clubs + national teams)
   --competition <name>       Competition display name (e.g. "Liga F")
-  --source <id>              Data source for sync (default: statsbomb)
-  --with-players             StatsBomb only: also sync v1 player match stats
+  --source <id>              Data source (default: statsbomb). Free or paid if login set.
+  --sb-user <email>          StatsBomb paid API username (or SB_USERNAME)
+  --sb-password <pass>       StatsBomb paid API password (or SB_PASSWORD)
+  --with-players             StatsBomb: also sync lineups/events → v1 player stats
+  --with-paid-player-match-stats   Paid API probe: official player-match aggregates
+  --with-paid-team-match-stats     Paid API probe: team-match aggregates
+  --with-paid-player-season-stats  Paid API probe: player season aggregates
+  --with-paid-team-season-stats    Paid API probe: team season aggregates
+  --with-paid-360                  Paid API probe: 360 frames (needs 360 licence)
   --player-stats-limit <n>   Max matches to enrich (default 5; fantasy default 25)
   --url <url>                Override data-bundle URL for pull
   --season <name>            Season label (e.g. "2023/2024")
@@ -72,6 +86,8 @@ Options:
   --json                     Force JSON cache (default)
   --help                     Show this help
 
+Sources: ${KNOWN_SOURCE_IDS.join(", ")}. Free by default; StatsBomb paid login → paid API.
+See: campus endpoints · campus credentials
 Periodic refresh: see docs/cron.md (GitHub Actions schedule + campus pull).
 `);
   process.exit(1);
@@ -111,57 +127,183 @@ function requireCompetition(cache: CampusCache, name: string) {
   return chosen;
 }
 
+async function resolveCliCredentials(args: string[]) {
+  return resolveCredentials({
+    statsbomb: {
+      username: getFlag(args, "--sb-user"),
+      password: getFlag(args, "--sb-password"),
+    },
+  });
+}
+
+function resolvePaidExtras(args: string[]): StatsBombPaidExtras {
+  return {
+    playerMatchStats: hasFlag(args, "--with-paid-player-match-stats"),
+    teamMatchStats: hasFlag(args, "--with-paid-team-match-stats"),
+    playerSeasonStats: hasFlag(args, "--with-paid-player-season-stats"),
+    teamSeasonStats: hasFlag(args, "--with-paid-team-season-stats"),
+    frames360: hasFlag(args, "--with-paid-360"),
+  };
+}
+
+function paidExtrasRequested(extras: StatsBombPaidExtras): boolean {
+  return Boolean(
+    extras.playerMatchStats ||
+      extras.teamMatchStats ||
+      extras.playerSeasonStats ||
+      extras.teamSeasonStats ||
+      extras.frames360,
+  );
+}
+
 async function cmdSync(args: string[]): Promise<void> {
   const fantasy = hasFlag(args, "--fantasy") || hasFlag(args, "--all");
   const competition = getFlag(args, "--competition");
   const withPlayers = hasFlag(args, "--with-players");
+  const paidExtras = resolvePaidExtras(args);
   const limitRaw = getFlag(args, "--player-stats-limit");
   const playerStatsLimit = limitRaw
     ? Number(limitRaw)
     : fantasy
       ? FANTASY_PLAYER_STATS_LIMIT
       : 5;
+  const creds = await resolveCliCredentials(args);
+  const sbCredentials = creds.statsbombPaidReady
+    ? {
+        username: creds.statsbomb.username,
+        password: creds.statsbomb.password,
+        apiBaseUrl: creds.statsbomb.apiBaseUrl,
+      }
+    : undefined;
+
+  if (paidExtrasRequested(paidExtras) && !sbCredentials) {
+    throw new Error(
+      "Paid extras flags need SB_USERNAME / SB_PASSWORD (or --sb-user / --sb-password). " +
+        "See docs/statsbomb-endpoints.md.",
+    );
+  }
 
   if (fantasy) {
     if (competition) {
       throw new Error("Use either --fantasy/--all or --competition, not both.");
     }
-    console.error("Syncing fantasy bundle (all StatsBomb women's competitions)…");
+    const mode = sbCredentials ? "paid API" : "Open Data";
+    console.error(
+      `Syncing fantasy bundle (all StatsBomb women's competitions, ${mode})…`,
+    );
     const result = await syncFantasyBundle({
       includePlayerStats: withPlayers,
       playerStatsLimit,
       latestSeasonPlayersOnly: true,
+      credentials: sbCredentials,
+      paidExtras,
       onProgress: (msg) => console.error(msg),
     });
     const cache = await writeSyncToStore(storeMode, dbPath, result);
-    printSyncSummary("statsbomb", result, cache);
+    printSyncSummary(`statsbomb:${sbCredentials ? "paid" : "open-data"}`, result, cache);
     return;
   }
 
   if (!competition) usage();
   const sourceId = (getFlag(args, "--source") ?? "statsbomb").toLowerCase();
 
-  let source: FootballSource;
-  if (sourceId === "statsbomb") {
-    source = new StatsBombSource({
-      includePlayerStats: withPlayers,
-      playerStatsLimit,
-    });
-  } else if (sourceId === "fbref") {
-    if (withPlayers) {
-      throw new Error(
-        "FBref player stats are not available yet (see docs/fbref-player-stats-deferred.md).",
-      );
-    }
-    source = new FbrefSource();
-  } else {
-    throw new Error(`Unknown source: "${sourceId}". Use statsbomb or fbref.`);
+  if (sourceId === "fbref" && withPlayers) {
+    throw new Error(
+      "FBref player stats are not available yet (see docs/fbref-player-stats-deferred.md).",
+    );
+  }
+  if (sourceId === "fbref" && paidExtrasRequested(paidExtras)) {
+    throw new Error("Paid extras apply only to --source statsbomb.");
   }
 
-  console.error(`Syncing "${competition}" from ${source.id}…`);
+  const source = createFootballSource(sourceId, {
+    statsbomb: {
+      includePlayerStats: withPlayers,
+      playerStatsLimit,
+      credentials: sbCredentials,
+      paidExtras,
+    },
+    credentials: sbCredentials,
+  });
+
+  const modeLabel =
+    sourceId === "statsbomb"
+      ? sbCredentials
+        ? "statsbomb:paid"
+        : "statsbomb:open-data"
+      : source.id;
+  console.error(`Syncing "${competition}" from ${modeLabel}…`);
   const result = await source.syncCompetition(competition);
   const cache = await writeSyncToStore(storeMode, dbPath, result);
-  printSyncSummary(source.id, result, cache);
+
+  let paidExtraProbes: unknown[] | undefined;
+  if (
+    paidExtrasRequested(paidExtras) &&
+    source instanceof StatsBombSource &&
+    result.competitions[0] &&
+    result.seasons[0]
+  ) {
+    const compNative = Number(
+      result.competitions[0].sources.find((s) => s.source === "statsbomb")?.id,
+    );
+    const seasonNative = Number(
+      result.seasons[0].sources
+        .find((s) => s.source === "statsbomb")
+        ?.id.split(":")
+        .at(-1),
+    );
+    const matchNative = result.matches[0]?.sources.find(
+      (s) => s.source === "statsbomb",
+    )?.id;
+    if (Number.isFinite(compNative) && Number.isFinite(seasonNative)) {
+      console.error("Probing optional paid endpoints (not yet mapped to schema)…");
+      paidExtraProbes = await source.probePaidExtras({
+        competitionId: compNative,
+        seasonId: seasonNative,
+        matchId: matchNative,
+      });
+    }
+  }
+
+  printSyncSummary(modeLabel, result, cache, paidExtraProbes);
+}
+
+async function cmdCredentials(args: string[]): Promise<void> {
+  const creds = await resolveCliCredentials(args);
+  const described = describeCredentials(creds);
+  console.log(
+    JSON.stringify(
+      {
+        ...described,
+        hint: creds.statsbombPaidReady
+          ? "StatsBomb paid login detected — sync uses data.statsbombservices.com"
+          : "No StatsBomb login — sync uses free Open Data. FBref stays free HTML only.",
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+async function cmdEndpoints(): Promise<void> {
+  console.log(
+    JSON.stringify(
+      {
+        endpoints: listStatsBombEndpoints().map((e) => ({
+          id: e.id,
+          name: e.name,
+          wiredInCampus: e.wiredInCampus,
+          requiresPaidLicense: e.requiresPaidLicense,
+          availability: e.availability,
+          paidPath: e.paidPath ?? null,
+          openDataPath: e.openDataPath ?? null,
+          notes: e.notes,
+        })),
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 function printSyncSummary(
@@ -175,6 +317,7 @@ function printSyncSummary(
     playerMatchStats?: unknown[];
   },
   cache: CampusCache,
+  paidExtraProbes?: unknown[],
 ): void {
   console.log(
     JSON.stringify(
@@ -187,6 +330,7 @@ function printSyncSummary(
         matches: result.matches.length,
         players: result.players?.length ?? 0,
         playerMatchStats: result.playerMatchStats?.length ?? 0,
+        paidExtraProbes,
         totals: {
           competitions: cache.competitions.length,
           seasons: cache.seasons.length,
@@ -208,6 +352,14 @@ async function cmdUpdate(args: string[]): Promise<void> {
   const playerStatsLimit = limitRaw
     ? Number(limitRaw)
     : FANTASY_PLAYER_STATS_LIMIT;
+  const creds = await resolveCliCredentials(args);
+  const sbCredentials = creds.statsbombPaidReady
+    ? {
+        username: creds.statsbomb.username,
+        password: creds.statsbomb.password,
+        apiBaseUrl: creds.statsbomb.apiBaseUrl,
+      }
+    : undefined;
   const before = await readStore(storeMode, dbPath);
   console.error(
     before.competitions.length === 0
@@ -218,10 +370,15 @@ async function cmdUpdate(args: string[]): Promise<void> {
     includePlayerStats: withPlayers,
     playerStatsLimit,
     latestSeasonPlayersOnly: true,
+    credentials: sbCredentials,
     onProgress: (msg) => console.error(msg),
   });
   const cache = await writeSyncToStore(storeMode, dbPath, result);
-  printSyncSummary("statsbomb", result, cache);
+  printSyncSummary(
+    `statsbomb:${sbCredentials ? "paid" : "open-data"}`,
+    result,
+    cache,
+  );
 }
 
 async function cmdPull(args: string[]): Promise<void> {
@@ -245,7 +402,6 @@ async function cmdPull(args: string[]): Promise<void> {
     players: remote.players ?? [],
     playerMatchStats: remote.playerMatchStats ?? [],
     lineups: remote.lineups ?? [],
-    injuries: remote.injuries ?? [],
   };
   const local = await readStore(storeMode, dbPath);
   const merged = mergeSyncResult(local, {
@@ -256,7 +412,6 @@ async function cmdPull(args: string[]): Promise<void> {
     players: incoming.players,
     playerMatchStats: incoming.playerMatchStats,
     lineups: incoming.lineups,
-    injuries: incoming.injuries,
   });
   // Preserve local identities; prefer remote entity payloads via mergeById.
   merged.identities = local.identities.length
@@ -612,21 +767,6 @@ async function cmdFantasyPoints(args: string[]): Promise<void> {
   );
 }
 
-async function cmdInjuries(): Promise<void> {
-  const client = CampusClient.fromCache(await readStore(storeMode, dbPath));
-  console.log(
-    JSON.stringify(
-      {
-        available: client.injuries().available,
-        message: INJURIES_STATUS_MESSAGE,
-        records: client.injuries().records,
-      },
-      null,
-      2,
-    ),
-  );
-}
-
 async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   if (!command || command === "--help" || args.includes("--help")) usage();
@@ -647,6 +787,13 @@ async function main(): Promise<void> {
       break;
     case "available":
       await cmdAvailable();
+      break;
+    case "credentials":
+    case "auth":
+      await cmdCredentials(args);
+      break;
+    case "endpoints":
+      await cmdEndpoints();
       break;
     case "competitions":
       await cmdCompetitions();
@@ -674,9 +821,6 @@ async function main(): Promise<void> {
       break;
     case "fantasy-points":
       await cmdFantasyPoints(args);
-      break;
-    case "injuries":
-      await cmdInjuries();
       break;
     case "identities":
       await cmdIdentities(args);

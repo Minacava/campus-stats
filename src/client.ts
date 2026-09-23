@@ -17,7 +17,6 @@ import {
   updateCachedCompetitions,
   type FantasySyncOptions,
 } from "./fantasy.js";
-import { listInjuries, INJURIES_AVAILABLE, INJURIES_STATUS_MESSAGE } from "./injuries.js";
 import {
   DEFAULT_FANTASY_RULES,
   scoreFantasyPoints,
@@ -27,7 +26,6 @@ import {
 import type {
   CampusCache,
   Competition,
-  InjuryRecord,
   LineupEntry,
   Match,
   Player,
@@ -92,7 +90,6 @@ export class CampusClient {
       players: remote.players ?? [],
       playerMatchStats: remote.playerMatchStats ?? [],
       lineups: remote.lineups ?? [],
-      injuries: remote.injuries ?? [],
     };
     const base = options.mergeWith ?? emptyCache();
     const merged = mergeSyncResult(base, {
@@ -103,7 +100,6 @@ export class CampusClient {
       players: incoming.players,
       playerMatchStats: incoming.playerMatchStats,
       lineups: incoming.lineups,
-      injuries: incoming.injuries,
     });
     merged.identities =
       base.identities.length > 0 ? base.identities : incoming.identities;
@@ -337,13 +333,5 @@ export class CampusClient {
       teamId: teams[0]?.id,
       rules: filter?.rules ?? DEFAULT_FANTASY_RULES,
     });
-  }
-
-  injuries(): { available: boolean; message: string; records: InjuryRecord[] } {
-    return {
-      available: INJURIES_AVAILABLE,
-      message: INJURIES_STATUS_MESSAGE,
-      records: listInjuries(this.cache),
-    };
   }
 }

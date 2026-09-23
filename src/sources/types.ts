@@ -1,6 +1,5 @@
 import type {
   Competition,
-  InjuryRecord,
   LineupEntry,
   Match,
   Player,
@@ -18,7 +17,6 @@ export interface SyncResult {
   players?: Player[];
   playerMatchStats?: PlayerMatchStats[];
   lineups?: LineupEntry[];
-  injuries?: InjuryRecord[];
 }
 
 /**

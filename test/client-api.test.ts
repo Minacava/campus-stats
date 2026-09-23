@@ -6,7 +6,6 @@ import {
   DEFAULT_FANTASY_RULES,
   scorePlayerMatchStats,
 } from "../src/scoring.js";
-import { INJURIES_AVAILABLE, listInjuries } from "../src/injuries.js";
 import type { CampusCache } from "../src/types.js";
 
 function sampleCache(): CampusCache {
@@ -102,11 +101,5 @@ describe("CampusClient library API", () => {
     );
     // appearance 1 + goal 4 + assist 3 + fullMatch 1 = 9
     assert.equal(row.points, 9);
-  });
-
-  it("exposes injuries as unavailable empty list", () => {
-    assert.equal(INJURIES_AVAILABLE, false);
-    assert.equal(listInjuries(sampleCache()).length, 0);
-    assert.equal(CampusClient.fromCache(sampleCache()).injuries().records.length, 0);
   });
 });
